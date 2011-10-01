@@ -1,0 +1,40 @@
+---------------------------------------------------------------------
+Rev. 1.28 - 2011-09-03
+* Added: Parameter $addExtraFields and the setter setExtraFields(bool), defaulting to TRUE. These Extra fields are needed for Mac's default Zip tool.
+
+* Added: Parameter $compress to addFile, it defaults to TRUE (same behaviour as previous versions) and allows the user to "store" files uncompressed in the archive.
+---------------------------------------------------------------------
+Rev. 1.27 - 2011-07-05
+* Fixed: (I hope) Problem with opening Zip files on Mac. Relevant discussion at http://www.phpclasses.org/discuss/package/6616/thread/4/
+---------------------------------------------------------------------
+Rev. 1.26 - 2011-07-03
+* Fixed: Silent failure when using ZipStream in PHP versions prior to 5.2.1 due to the lack of support for the sys_get_temp_dir function needed for large files. ZipStream now tests and dies properly if this is the case.
+
+* Fixed: Problem with opening Zip files on Mac. http://www.phpclasses.org/discuss/package/6616/thread/4/
+---------------------------------------------------------------------
+Rev. 1.25 - 2011-03-14
+* Fixed: Directory duplication in some circumstances caused by addDirectoryContent being called with an empty $zipPath argument. 
+
+* Fixed: getRelativePath returned absolute paths for relative paths and vice versa.
+---------------------------------------------------------------------
+Rev. 1.24 - 2011-03-13
+* Fixed: Parsing Windows absolute paths would result in relative paths where the Windows drive designation would be treated as just another path element.
+---------------------------------------------------------------------
+Rev. 1.23 - 2011-03-13
+* Added: static function getRelativePath, which cleans up paths, removing any unnecessary elements such as /./, // or redundant ../ segments.
+---------------------------------------------------------------------
+Rev. 1.22 - 2011-03-12
+* Added: method addDirectoryContent to add an entire directory, the functions defaults to recursive operation.
+---------------------------------------------------------------------
+Rev. 1.21 - 2011-02-20
+* Fixed: Sending failed when the Output buffer had been initialized with ob_start, but was empty.
+---------------------------------------------------------------------
+Rev. 1.20 - 2011-02-19
+(for Zip.php)
+* Changed: sendFile now have the optional parameter $contentType, defaulting to "application/zip". This is the mimetype of the archive to be sent, useful for file types using Zip as a container, like ePub, CBZ and ODF.
+
+(for ZipStream.php)
+* Changed: The constructor now have the optional parameter $contentType, defaulting to "application/zip". This is the mimetype of the archive to be sent, useful for file types using Zip as a container, like ePub, CBZ and ODF.
+---------------------------------------------------------------------
+Rev. 1.00 
+Initial release

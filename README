@@ -1,0 +1,17 @@
+A pair of PHP classes to generate zip files. 
+
+The projects that started these two classes are hosted on PHPClasses.org at the addresses:
+Zip      : http://www.phpclasses.org/package/6110
+ZipStream: http://www.phpclasses.org/package/6116
+
+Zip.php generates the Zip file in memory (or tempfile) allowing the parent script to save the final Zip file elsewhere, and/or send it to the user.
+ZipStream has much of the same features and functions of Zip.php, with a few notable differences, it does not cache and build the zip file on the server, instead it'll send the file to the user as a stream.
+
+See the examples for example usage. The php files have "some" doumentation in them in the form of Javadoc style function headers.
+
+TODO: 
+* Add compression level (at least "compress or store") to ZipStream, and to the Large file option on Zip.php
+* Documentation, no one reads it, but everyone complains if it is missing.
+* Better examples to fully cover the capabilities of the Zip classes.
+* more TODO's.
+
