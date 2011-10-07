@@ -174,12 +174,22 @@ class ZipStream {
 	 * @author Adam Schmalhofer <Adam.Schmalhofer@gmx.de>
 	 * @author A. Grandt
 	 *
-	 * @param String $realPath Path on the file system.
-	 * @param String $zipPath  Filepath and name to be used in the archive.
-	 * @param bool   $recursive     Add content recursively, default is TRUE.
+	 * @param String $realPath       Path on the file system.
+	 * @param String $zipPath        Filepath and name to be used in the archive.
+	 * @param bool   $recursive      Add content recursively, default is TRUE.
+	 * @param bool   $followSymlinks Follow and add symbolic links, if they are accessible, default is TRUE.
+	 * @param array  $addedFiles     Reference to the added files, this is used to prevent duplicates, efault is an empty array.
+	 *                               If you start the function by parsing an array, the array will be populated with the realPath
+	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
-	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE) {
-		if (file_exists($realPath)) {
+	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
+		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
+			if (is_dir($realPath)) {
+				$this->addDirectory($zipPath);
+			}
+
+			$addedFiles[realpath($realPath)] = $zipPath;
+
 			$iter = new DirectoryIterator($realPath);
 			foreach ($iter as $file) {
 				if ($file->isDot()) {
@@ -187,14 +197,21 @@ class ZipStream {
 				}
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
-				if ($file->isFile()) {
-					$this->addLargeFile($newRealPath, $newZipPath);
-				} else if ($recursive === TRUE) {
-					$this->addDirectoryContent($newRealPath, $newZipPath, $recursive);
+
+				if(file_exists($newRealPath) && ($folowSymliks === TRUE || !is_link($newRealPath))) {
+					if ($file->isFile()) {
+						$addedFiles[realpath($newRealPath)] = $newZipPath;
+						$this->addLargeFile($newRealPath, $newZipPath);
+					} else if ($recursive === TRUE) {
+						$this->addDirectoryContent($newRealPath, $newZipPath, $recursive);
+					} else {
+						$this->addDirectory($zipPath);
+					}
 				}
 			}
 		}
 	}
+
 
 	/**
 	 * Add a file to the archive at the specified location and file name.

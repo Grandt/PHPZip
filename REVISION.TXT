@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------
+Rev. 1.29 - 2011-10-07
+* Added: Parameters $followSymlinks and $addedFiles to the addDirectoryContent function.
+
+* Fixed: A problem in addDirectoryContent where unreadable symlinks could cause the function to go into an infinite loop.
+
+* Fixed: A problem in addDirectoryContent where directories weren't added if they were empty.
+---------------------------------------------------------------------
 Rev. 1.28 - 2011-09-03
 * Added: Parameter $addExtraFields and the setter setExtraFields(bool), defaulting to TRUE. These Extra fields are needed for Mac's default Zip tool.
 
