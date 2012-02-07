@@ -214,7 +214,7 @@ class Zip {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(file_exists($newRealPath) && ($folowSymliks === TRUE || !is_link($newRealPath))) {
+				if(file_exists($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
