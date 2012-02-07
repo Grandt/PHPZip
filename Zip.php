@@ -59,7 +59,7 @@ class Zip {
 	}
 
 	function __destruct() {
-		if (!is_null($this->zipFile)) {
+		if (is_resource($this->zipFile)) {
 			fclose($this->zipFile);
 		}
 		$this->zipData = NULL;
@@ -100,11 +100,11 @@ class Zip {
 	 * @return bool $success
 	 */
 	public function setZipFile($fileName) {
-		if (file_exists($fileName)) {
+		if (is_file($fileName)) {
 			unlink ($fileName);
 		}
 		$fd=fopen($fileName, "x+b");
-		if (!is_null($this->zipFile)) {
+		if (is_resource($this->zipFile)) {
 			rewind($this->zipFile);
 			while(!feof($this->zipFile)) {
 				fwrite($fd, fread($this->zipFile, $this->streamChunkSize));
@@ -169,14 +169,14 @@ class Zip {
 			$gpFlags = "\x00\x00"; // Compression type 0 = stored
 		}
 
-		if (is_null($this->zipFile) && ($this->offset + $gzLength) > $this->zipMemoryThreshold) {
+		if (!is_resource($this->zipFile) && ($this->offset + $gzLength) > $this->zipMemoryThreshold) {
 			$this->zipFile = tmpfile();
 			fwrite($this->zipFile, $this->zipData);
 			$this->zipData = NULL;
 		}
 
 		$this->buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, self::EXT_FILE_ATTR_FILE);
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			$this->zipData .= $gzData;
 		} else {
 			fwrite($this->zipFile, $gzData);
@@ -250,7 +250,7 @@ class Zip {
 		}
 		fclose($fh);
 
-		$this->closeStream($this->addExtraField);
+		$this->closeStream($this->addExtraFields);
 
 		return TRUE;
 	}
@@ -272,7 +272,7 @@ class Zip {
 			return FALSE;
 		}
 
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			$this->zipFile = tmpfile();
 			fwrite($this->zipFile, $this->zipData);
 			$this->zipData = NULL;
@@ -374,13 +374,13 @@ class Zip {
 			. pack("v", sizeof($this->cdRec))
 			. pack("V", strlen($cd))
 			. pack("V", $this->offset);
-			if (!is_null($this->zipComment)) {
+			if (!empty($this->zipComment)) {
 				$cdRec .= pack("v", strlen($this->zipComment)) . $this->zipComment;
 			} else {
 				$cdRec .= "\x00\x00";
 			}
 
-			if (is_null($this->zipFile)) {
+			if (!is_resource($this->zipFile)) {
 				$this->zipData .= $cdRec;
 			} else {
 				fwrite($this->zipFile, $cdRec);
@@ -405,7 +405,7 @@ class Zip {
 		if(!$this->isFinalized) {
 			$this->finalize();
 		}
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			$this->zipFile = tmpfile();
 			fwrite($this->zipFile, $this->zipData);
 			$this->zipData = NULL;
@@ -425,7 +425,7 @@ class Zip {
 		if(!$this->isFinalized) {
 			$this->finalize();
 		}
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			return $this->zipData;
 		} else {
 			rewind($this->zipFile);
@@ -462,7 +462,7 @@ class Zip {
 				header("Content-Transfer-Encoding: binary");
 				header("Content-Length: ". $this->getArchiveSize());
 
-				if (is_null($this->zipFile)) {
+				if (!is_resource($this->zipFile)) {
 					echo $this->zipData;
 				} else {
 					rewind($this->zipFile);
@@ -483,7 +483,7 @@ class Zip {
 	 * @return $size Size of the archive
 	 */
 	public function getArchiveSize() {
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			return strlen($this->zipData);
 		}
 		$filestat = fstat($this->zipFile);
@@ -522,7 +522,7 @@ class Zip {
 	 */
 	private function buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, $extFileAttr) {
 		$filePath = str_replace("\\", "/", $filePath);
-		$fileCommentLength = (is_null($fileComment) ? 0 : strlen($fileComment));
+		$fileCommentLength = (empty($fileComment) ? 0 : strlen($fileComment));
 
 		$timestamp = (int)$timestamp;
 		$timestamp = ($timestamp == 0 ? time() : $timestamp);
@@ -534,10 +534,10 @@ class Zip {
 		$zipEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$zipEntry .= pack("VV", $gzLength, $dataLength);
 		$zipEntry .= pack("v", strlen($filePath) ); // File name length
-		$zipEntry .= $this->addExtraField ? "\x10\x00" : "\x00\x00"; // Extra field length
+		$zipEntry .= $this->addExtraFields ? "\x10\x00" : "\x00\x00"; // Extra field length
 		$zipEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$zipEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$zipEntry .= "\x0c\x00";   			// TSize	Short	total data size for this block
 			$zipEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
@@ -545,7 +545,7 @@ class Zip {
 			$zipEntry .= "\x00\x00\x00\x00";
 		}
 
-		if (is_null($this->zipFile)) {
+		if (!is_resource($this->zipFile)) {
 			$this->zipData .= $zipEntry;
 		} else {
 			fwrite($this->zipFile, $zipEntry);
@@ -557,7 +557,7 @@ class Zip {
 		$cdEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$cdEntry .= pack("VV", $gzLength, $dataLength);
 		$cdEntry .= pack("v", strlen($filePath)); // Filename length
-		$cdEntry .= $this->addExtraField ? "\x0c\x00" : "\x00\x00"; // Extra field length
+		$cdEntry .= $this->addExtraFields ? "\x0c\x00" : "\x00\x00"; // Extra field length
 		$cdEntry .= pack("v", $fileCommentLength); // File comment length
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
@@ -565,14 +565,14 @@ class Zip {
 		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$cdEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$cdEntry .= "\x08\x00";   			// TSize	Short	total data size for this block
 			$cdEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
 			$cdEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
 		}
 
-		if (!is_null($fileComment)) {
+		if (!empty($fileComment)) {
 			$cdEntry .= $fileComment; // Comment
 		}
 
@@ -603,7 +603,7 @@ class Zip {
 	 */
 	public static function getRelativePath($path) {
 		$path = preg_replace("#/+\.?/+#", "/", str_replace("\\", "/", $path));
-		$dirs = explode("/", rtrim(preg_replace('#^(\./)+#', '', $path), '/'));
+		$dirs = explode("/", rtrim(preg_replace('#^(?:\./)+#', '', $path), '/'));
 
 		$offset = 0;
 		$sub = 0;
