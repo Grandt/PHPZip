@@ -183,7 +183,7 @@ class ZipStream {
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
 	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
-		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
+		if (is_file($realPath) && !isset($addedFiles[realpath($realPath)])) {
 			if (is_dir($realPath)) {
 				$this->addDirectory($zipPath);
 			}
@@ -198,7 +198,7 @@ class ZipStream {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(file_exists($newRealPath) && ($folowSymliks === TRUE || !is_link($newRealPath))) {
+				if(file_exists($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
@@ -362,7 +362,7 @@ class ZipStream {
 			print(pack("v", sizeof($this->cdRec)));
 			print(pack("V", strlen($cd)));
 			print(pack("V", $this->offset));
-			if (!is_null($this->zipComment)) {
+			if (!empty($this->zipComment)) {
 				print(pack("v", strlen($this->zipComment)));
 				print($this->zipComment);
 			} else {
@@ -411,7 +411,7 @@ class ZipStream {
 	 */
 	private function buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, $extFileAttr) {
 		$filePath = str_replace("\\", "/", $filePath);
-		$fileCommentLength = (is_null($fileComment) ? 0 : strlen($fileComment));
+		$fileCommentLength = (empty($fileComment) ? 0 : strlen($fileComment));
 		$timestamp = (int)$timestamp;
 		$timestamp = ($timestamp == 0 ? time() : $timestamp);
 
@@ -456,7 +456,7 @@ class ZipStream {
 			$cdEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
 		}
 
-		if (!is_null($fileComment)) {
+		if (!empty($fileComment)) {
 			$cdEntry .= $fileComment; // Comment
 		}
 
@@ -487,7 +487,7 @@ class ZipStream {
 	 */
 	public static function getRelativePath($path) {
 		$path = preg_replace("#/+\.?/+#", "/", str_replace("\\", "/", $path));
-		$dirs = explode("/", rtrim(preg_replace('#^(\./)+#', '', $path), '/'));
+		$dirs = explode("/", rtrim(preg_replace('#^(?:\./)+#', '', $path), '/'));
 
 		$offset = 0;
 		$sub = 0;
