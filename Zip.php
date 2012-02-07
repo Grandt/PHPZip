@@ -250,7 +250,7 @@ class Zip {
 		}
 		fclose($fh);
 
-		$this->closeStream($this->addExtraField);
+		$this->closeStream($this->addExtraFields);
 
 		return TRUE;
 	}
@@ -534,10 +534,10 @@ class Zip {
 		$zipEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$zipEntry .= pack("VV", $gzLength, $dataLength);
 		$zipEntry .= pack("v", strlen($filePath) ); // File name length
-		$zipEntry .= $this->addExtraField ? "\x10\x00" : "\x00\x00"; // Extra field length
+		$zipEntry .= $this->addExtraFields ? "\x10\x00" : "\x00\x00"; // Extra field length
 		$zipEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$zipEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$zipEntry .= "\x0c\x00";   			// TSize	Short	total data size for this block
 			$zipEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
@@ -557,7 +557,7 @@ class Zip {
 		$cdEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$cdEntry .= pack("VV", $gzLength, $dataLength);
 		$cdEntry .= pack("v", strlen($filePath)); // Filename length
-		$cdEntry .= $this->addExtraField ? "\x0c\x00" : "\x00\x00"; // Extra field length
+		$cdEntry .= $this->addExtraFields ? "\x0c\x00" : "\x00\x00"; // Extra field length
 		$cdEntry .= pack("v", $fileCommentLength); // File comment length
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
@@ -565,7 +565,7 @@ class Zip {
 		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$cdEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$cdEntry .= "\x08\x00";   			// TSize	Short	total data size for this block
 			$cdEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
