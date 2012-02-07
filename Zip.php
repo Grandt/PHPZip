@@ -9,13 +9,13 @@
  * License: GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  *
  * @author A. Grandt
- * @copyright A. Grandt 2009-2011
+ * @copyright A. Grandt 2009-2012
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6110
- * @version 1.28
+ * @version 1.29
  */
 class Zip {
-	const VERSION = 1.28;
+	const VERSION = 1.29;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
