@@ -13,13 +13,13 @@
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
  * @author A. Grandt
- * @copyright A. Grandt 2010-2011
+ * @copyright A. Grandt 2010-2012
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6616
- * @version 1.28
+ * @version 1.29
  */
 class ZipStream {
-	const VERSION = 1.28;
+	const VERSION = 1.29;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -246,7 +246,7 @@ class ZipStream {
 		if ($doClose) {
 			fclose($fh);
 		}
-		$this->closeStream($this->addExtraField);
+		$this->closeStream($this->addExtraFields);
 
 		return true;
 	}
@@ -422,10 +422,10 @@ class ZipStream {
 		$zipEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$zipEntry .= pack("VV", $gzLength, $dataLength);
 		$zipEntry .= pack("v", strlen($filePath) ); // File name length
-		$zipEntry .= $this->addExtraField ? "\x10\x00" : "\x00\x00"; // Extra field length
+		$zipEntry .= $this->addExtraFields ? "\x10\x00" : "\x00\x00"; // Extra field length
 		$zipEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$zipEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$zipEntry .= "\x0c\x00";   			// TSize	Short	total data size for this block
 			$zipEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
@@ -441,7 +441,7 @@ class ZipStream {
 		$cdEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
 		$cdEntry .= pack("VV", $gzLength, $dataLength);
 		$cdEntry .= pack("v", strlen($filePath)); // Filename length
-		$cdEntry .= $this->addExtraField ? "\x0c\x00" : "\x00\x00"; // Extra field length
+		$cdEntry .= $this->addExtraFields ? "\x0c\x00" : "\x00\x00"; // Extra field length
 		$cdEntry .= pack("v", $fileCommentLength); // File comment length
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
@@ -449,7 +449,7 @@ class ZipStream {
 		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraField) {
+		if ($this->addExtraFields) {
 			$cdEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
 			$cdEntry .= "\x08\x00";   			// TSize	Short	total data size for this block
 			$cdEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
