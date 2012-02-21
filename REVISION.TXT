@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------
+Rev. 1.30 - 2012-01-21
+* Fixed: Issue #3, Error in TimeZone handling.
+
+Additionally. If you are experiencing problems with the MacOS X default Archive Utility, try to uncomment line 124, if that works, let me know.
+
+---------------------------------------------------------------------
 Rev. 1.29 - 2011-10-07
 * Added: Parameters $followSymlinks and $addedFiles to the addDirectoryContent function.
 
