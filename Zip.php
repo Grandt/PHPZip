@@ -12,10 +12,10 @@
  * @copyright A. Grandt 2009-2012
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6110
- * @version 1.29
+ * @version 1.30
  */
 class Zip {
-	const VERSION = 1.29;
+	const VERSION = 1.30;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -499,7 +499,10 @@ class Zip {
 	 */
 	private function getDosTime($timestamp = 0) {
 		$timestamp = (int)$timestamp;
-		$date = ($timestamp == 0 ? getdate() : getDate($timestamp));
+		$oldTZ = @date_default_timezone_get();
+		date_default_timezone_set('UTC');
+		$date = ($timestamp == 0 ? getdate() : getdate($timestamp));
+		date_default_timezone_set($oldTZ);
 		if ($date["year"] >= 1980) {
 			return pack("V", (($date["mday"] + ($date["mon"] << 5) + (($date["year"]-1980) << 9)) << 16) |
 			(($date["seconds"] >> 1) + ($date["minutes"] << 5) + ($date["hours"] << 11)));
