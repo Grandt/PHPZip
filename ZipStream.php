@@ -13,13 +13,13 @@
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
  * @author A. Grandt
- * @copyright A. Grandt 2010-2012
+ * @copyright A. Grandt 2010-2011
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6616
- * @version 1.29
+ * @version 1.30
  */
 class ZipStream {
-	const VERSION = 1.29;
+	const VERSION = 1.30;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -37,7 +37,7 @@ class ZipStream {
 	private $cdRec = array(); // central directory
 	private $offset = 0;
 	private $isFinalized = false;
-	private $addExtraFields = TRUE;
+	private $addExtraField = TRUE;
 
 	private $streamChunkSize = 65536;
 	private $streamFilePath = null;
@@ -90,7 +90,7 @@ class ZipStream {
 	 * @param bool $setExtraField TRUE (default) will enable adding of extra fields, anything else will disable it.
 	 */
 	function setExtraField($setExtraField = TRUE) {
-		$this->addExtraFields = ($setExtraField === TRUE);
+		$this->addExtraField = ($setExtraField === TRUE);
 	}
 
 	/**
@@ -183,7 +183,7 @@ class ZipStream {
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
 	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
-		if (is_file($realPath) && !isset($addedFiles[realpath($realPath)])) {
+		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
 			if (is_dir($realPath)) {
 				$this->addDirectory($zipPath);
 			}
@@ -198,7 +198,7 @@ class ZipStream {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(file_exists($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
+				if(file_exists($newRealPath) && ($folowSymliks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
@@ -246,7 +246,7 @@ class ZipStream {
 		if ($doClose) {
 			fclose($fh);
 		}
-		$this->closeStream($this->addExtraFields);
+		$this->closeStream($this->addExtraField);
 
 		return true;
 	}
@@ -355,14 +355,14 @@ class ZipStream {
 				$this->closeStream();
 			}
 
+			$cdRecSize = pack("v", sizeof($this->cdRec));
+			
 			$cd = implode("", $this->cdRec);
 			print($cd);
 			print(self::ZIP_END_OF_CENTRAL_DIRECTORY);
-			print(pack("v", sizeof($this->cdRec)));
-			print(pack("v", sizeof($this->cdRec)));
-			print(pack("V", strlen($cd)));
-			print(pack("V", $this->offset));
-			if (!empty($this->zipComment)) {
+			print($cdRecSize.$cdRecSize);
+			print(pack("VV", strlen($cd), $this->offset));
+			if (!is_null($this->zipComment)) {
 				print(pack("v", strlen($this->zipComment)));
 				print($this->zipComment);
 			} else {
@@ -388,7 +388,10 @@ class ZipStream {
 	 */
 	private function getDosTime($timestamp = 0) {
 		$timestamp = (int)$timestamp;
-		$date = ($timestamp == 0 ? getdate() : getDate($timestamp));
+		$oldTZ = @date_default_timezone_get();
+		date_default_timezone_set('UTC');
+		$date = ($timestamp == 0 ? getdate() : getdate($timestamp));
+		date_default_timezone_set($oldTZ);
 		if ($date["year"] >= 1980) {
 			return pack("V", (($date["mday"] + ($date["mon"] << 5) + (($date["year"]-1980) << 9)) << 16) |
 			(($date["seconds"] >> 1) + ($date["minutes"] << 5) + ($date["hours"] << 11)));
@@ -411,25 +414,27 @@ class ZipStream {
 	 */
 	private function buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, $extFileAttr) {
 		$filePath = str_replace("\\", "/", $filePath);
-		$fileCommentLength = (empty($fileComment) ? 0 : strlen($fileComment));
+		$fileCommentLength = (is_null($fileComment) ? 0 : strlen($fileComment));
 		$timestamp = (int)$timestamp;
 		$timestamp = ($timestamp == 0 ? time() : $timestamp);
 
 		$dosTime = $this->getDosTime($timestamp);
-
+		$tsPack = pack("V", $timestamp);
+		
+		$header = self::ATTR_VERSION_TO_EXTRACT
+		. $gpFlags . $gzType . $dosTime. $fileCRC32
+		. pack("VVv", $gzLength, $dataLength, strlen($filePath) ); // File name length
+		
 		$zipEntry  = self::ZIP_LOCAL_FILE_HEADER;
-		$zipEntry .= self::ATTR_VERSION_TO_EXTRACT;
-		$zipEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
-		$zipEntry .= pack("VV", $gzLength, $dataLength);
-		$zipEntry .= pack("v", strlen($filePath) ); // File name length
-		$zipEntry .= $this->addExtraFields ? "\x10\x00" : "\x00\x00"; // Extra field length
+		$zipEntry .= $header;
+		$zipEntry .= $this->addExtraField ? "\x10\x00" : "\x00\x00"; // Extra field length
 		$zipEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraFields) {
-			$zipEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
-			$zipEntry .= "\x0c\x00";   			// TSize	Short	total data size for this block
-			$zipEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
-			$zipEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
+		if ($this->addExtraField) {
+			$zipEntry .= "\x55\x58";// 0x5855	Short	tag for this extra block type ("UX")
+			$zipEntry .= "\x0c\x00";// TSize	Short	total data size for this block
+			$zipEntry .= $tsPack;	// AcTime	Long	time of last access (UTC/GMT)
+			$zipEntry .= $tsPack;	// ModTime	Long	time of last modification (UTC/GMT)
 			$zipEntry .= "\x00\x00\x00\x00";
 		}
 
@@ -437,11 +442,8 @@ class ZipStream {
 
 		$cdEntry  = self::ZIP_CENTRAL_FILE_HEADER;
 		$cdEntry .= self::ATTR_MADE_BY_VERSION;
-		$cdEntry .= self::ATTR_VERSION_TO_EXTRACT;
-		$cdEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
-		$cdEntry .= pack("VV", $gzLength, $dataLength);
-		$cdEntry .= pack("v", strlen($filePath)); // Filename length
-		$cdEntry .= $this->addExtraFields ? "\x0c\x00" : "\x00\x00"; // Extra field length
+		$cdEntry .= $header;
+		$cdEntry .= $this->addExtraField ? "\x0c\x00" : "\x00\x00"; // Extra field length
 		$cdEntry .= pack("v", $fileCommentLength); // File comment length
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
@@ -449,14 +451,14 @@ class ZipStream {
 		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraFields) {
-			$cdEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
-			$cdEntry .= "\x08\x00";   			// TSize	Short	total data size for this block
-			$cdEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
-			$cdEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
+		if ($this->addExtraField) {
+			$cdEntry .= "\x55\x58"; // 0x5855	Short	tag for this extra block type ("UX")
+			$cdEntry .= "\x08\x00"; // TSize	Short	total data size for this block
+			$cdEntry .= $tsPack;	// AcTime	Long	time of last access (UTC/GMT)
+			$cdEntry .= $tsPack;	// ModTime	Long	time of last modification (UTC/GMT)
 		}
 
-		if (!empty($fileComment)) {
+		if (!is_null($fileComment)) {
 			$cdEntry .= $fileComment; // Comment
 		}
 
@@ -487,7 +489,7 @@ class ZipStream {
 	 */
 	public static function getRelativePath($path) {
 		$path = preg_replace("#/+\.?/+#", "/", str_replace("\\", "/", $path));
-		$dirs = explode("/", rtrim(preg_replace('#^(?:\./)+#', '', $path), '/'));
+		$dirs = explode("/", rtrim(preg_replace('#^(\./)+#', '', $path), '/'));
 
 		$offset = 0;
 		$sub = 0;
