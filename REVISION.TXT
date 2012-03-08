@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------
+Rev. 1.32 - 2012-03-08
+* Fixed: Empty directories work as well now.
+
+* Note: The large file handling were practically entirely rewritten. This adds an additional dependency to the class, that the PHP Zip package must be available. 
+---------------------------------------------------------------------
+Rev. 1.31 - 2012-03-01
+* Fixed: Mac OSX default Archive Utility should now be able to load the files produced by this utility. 
+---------------------------------------------------------------------
 Rev. 1.30 - 2012-01-21
 * Fixed: Issue #3, Error in TimeZone handling.
 
