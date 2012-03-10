@@ -12,20 +12,20 @@
  * @copyright A. Grandt 2009-2012
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6110
- * @version 1.30
+ * @version 1.32
  */
 class Zip {
-	const VERSION = 1.30;
+	const VERSION = 1.32;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
 	const ZIP_END_OF_CENTRAL_DIRECTORY = "\x50\x4b\x05\x06\x00\x00\x00\x00"; //end of Central directory record
 
-	const EXT_FILE_ATTR_DIR = "\x10\x40\xed\x41"; // Unix : Dir + mod:755
-	const EXT_FILE_ATTR_FILE = "\x00\x40\xa4\x81"; // Unix : File + mod:644
+	const EXT_FILE_ATTR_DIR = "\x10\x00\xFF\x41";
+	const EXT_FILE_ATTR_FILE = "\x00\x00\xFF\x81";
 
-	const ATTR_VERSION_TO_EXTRACT = "\x0A\x00"; // Version needed to extract
-	const ATTR_MADE_BY_VERSION = "\x15\x03"; // Made By Version
+	const ATTR_VERSION_TO_EXTRACT = "\x14\x00"; // Version needed to extract
+	const ATTR_MADE_BY_VERSION = "\x1E\x03"; // Made By Version
 
 	private $zipMemoryThreshold = 1048576; // Autocreate tempfile if the zip data exceeds 1048576 bytes (1 MB)
 
@@ -35,7 +35,7 @@ class Zip {
 	private $cdRec = array(); // central directory
 	private $offset = 0;
 	private $isFinalized = FALSE;
-	private $addExtraFields = TRUE;
+	private $addExtraField = TRUE;
 
 	private $streamChunkSize = 65536;
 	private $streamFilePath = NULL;
@@ -44,7 +44,7 @@ class Zip {
 	private $streamFile = NULL;
 	private $streamData = NULL;
 	private $streamFileLength = 0;
-	
+
 	/**
 	 * Constructor.
 	 *
@@ -72,7 +72,7 @@ class Zip {
 	 * @param bool $setExtraField TRUE (default) will enable adding of extra fields, anything else will disable it.
 	 */
 	function setExtraField($setExtraField = TRUE) {
-		$this->addExtraFields = ($setExtraField === TRUE);
+		$this->addExtraField = ($setExtraField === TRUE);
 	}
 
 	/**
@@ -133,6 +133,12 @@ class Zip {
 		if ($this->isFinalized) {
 			return FALSE;
 		}
+
+		$length = strlen($directoryPath);
+		if (substr($haystack, 0, $length) !== '/') {
+			$directoryPath = $directoryPath . "/";
+		}
+
 		$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
 
 		return TRUE;
@@ -152,8 +158,13 @@ class Zip {
 			return FALSE;
 		}
 
+		if (is_resource($data) && get_resource_type($data) == "stream") {
+			$this->addLargeFile($data, $filePath, $timestamp, $fileComment);
+			return FALSE;
+		}
+
 		$gzType = "\x08\x00"; // Compression type 8 = deflate
-		$gpFlags = "\x02\x00"; // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
+		$gpFlags = "\x00\x00"; // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
 		$dataLength = strlen($data);
 		$fileCRC32 = pack("V", crc32($data));
 
@@ -170,17 +181,13 @@ class Zip {
 		}
 
 		if (!is_resource($this->zipFile) && ($this->offset + $gzLength) > $this->zipMemoryThreshold) {
-			$this->zipFile = tmpfile();
-			fwrite($this->zipFile, $this->zipData);
-			$this->zipData = NULL;
+			$this->zipflush();
 		}
 
 		$this->buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, self::EXT_FILE_ATTR_FILE);
-		if (!is_resource($this->zipFile)) {
-			$this->zipData .= $gzData;
-		} else {
-			fwrite($this->zipFile, $gzData);
-		}
+
+		$this->zipwrite($gzData);
+
 		return TRUE;
 	}
 
@@ -199,7 +206,7 @@ class Zip {
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
 	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
-		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
+		if (is_file($realPath) && !isset($addedFiles[realpath($realPath)])) {
 			if (is_dir($realPath)) {
 				$this->addDirectory($zipPath);
 			}
@@ -214,7 +221,7 @@ class Zip {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(file_exists($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
+				if(is_file($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
@@ -242,16 +249,17 @@ class Zip {
 			return FALSE;
 		}
 
-		$this->openStream($filePath, $timestamp, $fileComment);
+		if (is_string($dataFile) && is_file($dataFile)) {
+			$this->processFile($dataFile, $filePath, $timestamp, $fileComment);
+		} else if (is_resource($dataFile) && get_resource_type($dataFile) == "stream") {
+			$fh = $dataFile;
+			$this->openStream($filePath, $timestamp, $fileComment);
 
-		$fh = fopen($dataFile, "rb");
-		while(!feof($fh)) {
-			$this->addStreamData(fread($fh, $this->streamChunkSize));
+			while(!feof($fh)) {
+				$this->addStreamData(fread($fh, $this->streamChunkSize));
+			}
+			$this->closeStream($this->addExtraField);
 		}
-		fclose($fh);
-
-		$this->closeStream($this->addExtraFields);
-
 		return TRUE;
 	}
 
@@ -263,7 +271,7 @@ class Zip {
 	 * @param String $fileComment (Optional) Comment to be added to the archive for this file. To use fileComment, timestamp must be given.
 	 * @return bool $success
 	 */
-	public function openStream($filePath, $timestamp = 0, $fileComment = NULL)   {
+	public function openStream($filePath, $timestamp = 0, $fileComment = null)   {
 		if ( !function_exists('sys_get_temp_dir')) {
 			die ("ERROR: Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
 		}
@@ -272,17 +280,14 @@ class Zip {
 			return FALSE;
 		}
 
-		if (!is_resource($this->zipFile)) {
-			$this->zipFile = tmpfile();
-			fwrite($this->zipFile, $this->zipData);
-			$this->zipData = NULL;
-		}
+		$this->zipflush();
 
 		if (strlen($this->streamFilePath) > 0) {
 			closeStream();
 		}
+
 		$this->streamFile = tempnam(sys_get_temp_dir(), 'Zip');
-		$this->streamData = gzopen($this->streamFile, "w9");
+		$this->streamData = fopen($this->streamFile, "wb");
 		$this->streamFilePath = $filePath;
 		$this->streamTimestamp = $timestamp;
 		$this->streamFileComment = $fileComment;
@@ -290,7 +295,6 @@ class Zip {
 
 		return TRUE;
 	}
-
 	/**
 	 * Add data to the open stream.
 	 *
@@ -302,9 +306,9 @@ class Zip {
 			return FALSE;
 		}
 
-		$length = gzwrite($this->streamData, $data, strlen($data));
+		$length = fwrite($this->streamData, $data, strlen($data));
 		if ($length != strlen($data)) {
-			print "<p>Length mismatch</p>\n";
+			die ("<p>Length mismatch</p>\n");
 		}
 		$this->streamFileLength += $length;
 
@@ -322,38 +326,72 @@ class Zip {
 		}
 
 		fflush($this->streamData);
-		gzclose($this->streamData);
+		fclose($this->streamData);
 
-		$gzType = "\x08\x00"; // Compression type 8 = deflate
-		$gpFlags = "\x02\x00"; // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
+		$this->processFile($this->streamFile, $this->streamFilePath, $this->streamTimestamp, $this->streamFileComment);
 
-		$file_handle = fopen($this->streamFile, "rb");
-		$stats = fstat($file_handle);
-		$eof = $stats['size'];
-
-		fseek($file_handle, $eof-8);
-		$fileCRC32 = fread($file_handle, 4);
-		$dataLength = $this->streamFileLength;//$gzl[1];
-
-		$gzLength = $eof-10;
-		$eof -= 9;
-
-		fseek($file_handle, 10);
-
-		$this->buildZipEntry($this->streamFilePath, $this->streamFileComment, $gpFlags, $gzType, $this->streamTimestamp, $fileCRC32, $gzLength, $dataLength, self::EXT_FILE_ATTR_FILE);
-		while(!feof($file_handle)) {
-			fwrite($this->zipFile, fread($file_handle, $this->streamChunkSize));
-		}
-
-		unlink($this->streamFile);
-		$this->streamFile = NULL;
-		$this->streamData = NULL;
-		$this->streamFilePath = NULL;
-		$this->streamTimestamp = NULL;
-		$this->streamFileComment = NULL;
+		$this->streamData = null;
+		$this->streamFilePath = null;
+		$this->streamTimestamp = null;
+		$this->streamFileComment = null;
 		$this->streamFileLength = 0;
 
+		// Windows is a little slow at times, so a millisecond later, we can unlink this.
+		unlink($this->streamFile);
+
+		$this->streamFile = null;
+
 		return TRUE;
+	}
+
+	private function processFile($dataFile, $filePath, $timestamp = 0, $fileComment = null) {
+		if ($this->isFinalized) {
+			return FALSE;
+		}
+
+		$tempzip = tempnam(sys_get_temp_dir(), 'ZipStream');
+
+		$zip = new ZipArchive;
+		if ($zip->open($tempzip) === TRUE) {
+			$zip->addFile($dataFile, 'file');
+			$zip->close();
+		}
+
+		$file_handle = fopen($tempzip, "rb");
+		$stats = fstat($file_handle);
+		$eof = $stats['size']-72;
+
+		fseek($file_handle, 6);
+
+		$gpFlags = fread($file_handle, 2);
+		$gzType = fread($file_handle, 2);
+		fread($file_handle, 4);
+		$fileCRC32 = fread($file_handle, 4);
+		$v = unpack("Vval", fread($file_handle, 4));
+		$gzLength = $v['val'];
+		$v = unpack("Vval", fread($file_handle, 4));
+		$dataLength = $v['val'];
+
+		$this->buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, self::EXT_FILE_ATTR_FILE);
+
+		fseek($file_handle, 34);
+		$pos = 34;
+
+		while(!feof($file_handle)) {
+			$data = fread($file_handle, $this->streamChunkSize);
+			$datalen = strlen($data);
+			if ($datalen+$pos > $eof) {
+				$datalen = $eof-$pos;
+				$data = substr($data, 0, $datalen);
+			}
+			$pos += $datalen;
+
+			$this->zipwrite($data);
+		}
+
+		fclose($file_handle);
+
+		unlink($tempzip);
 	}
 
 	/**
@@ -369,23 +407,18 @@ class Zip {
 			}
 			$cd = implode("", $this->cdRec);
 
+			$cdRecSize = pack("v", sizeof($this->cdRec));
 			$cdRec = $cd . self::ZIP_END_OF_CENTRAL_DIRECTORY
-			. pack("v", sizeof($this->cdRec))
-			. pack("v", sizeof($this->cdRec))
-			. pack("V", strlen($cd))
-			. pack("V", $this->offset);
+			. $cdRecSize . $cdRecSize
+			. pack("VV", strlen($cd), $this->offset);
 			if (!empty($this->zipComment)) {
 				$cdRec .= pack("v", strlen($this->zipComment)) . $this->zipComment;
 			} else {
 				$cdRec .= "\x00\x00";
 			}
 
-			if (!is_resource($this->zipFile)) {
-				$this->zipData .= $cdRec;
-			} else {
-				fwrite($this->zipFile, $cdRec);
-				fflush($this->zipFile);
-			}
+			$this->zipwrite($cdRec);
+
 			$this->isFinalized = TRUE;
 			$cd = NULL;
 			$this->cdRec = NULL;
@@ -405,11 +438,9 @@ class Zip {
 		if(!$this->isFinalized) {
 			$this->finalize();
 		}
-		if (!is_resource($this->zipFile)) {
-			$this->zipFile = tmpfile();
-			fwrite($this->zipFile, $this->zipData);
-			$this->zipData = NULL;
-		}
+
+		$this->zipflush();
+
 		rewind($this->zipFile);
 
 		return $this->zipFile;
@@ -505,7 +536,7 @@ class Zip {
 		date_default_timezone_set($oldTZ);
 		if ($date["year"] >= 1980) {
 			return pack("V", (($date["mday"] + ($date["mon"] << 5) + (($date["year"]-1980) << 9)) << 16) |
-			(($date["seconds"] >> 1) + ($date["minutes"] << 5) + ($date["hours"] << 11)));
+					(($date["seconds"] >> 1) + ($date["minutes"] << 5) + ($date["hours"] << 11)));
 		}
 		return "\x00\x00\x00\x00";
 	}
@@ -526,41 +557,34 @@ class Zip {
 	private function buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, $extFileAttr) {
 		$filePath = str_replace("\\", "/", $filePath);
 		$fileCommentLength = (empty($fileComment) ? 0 : strlen($fileComment));
-
 		$timestamp = (int)$timestamp;
 		$timestamp = ($timestamp == 0 ? time() : $timestamp);
 
 		$dosTime = $this->getDosTime($timestamp);
+		$tsPack = pack("V", $timestamp);
+
+		$ux = "\x75\x78\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00";
+
+		$header = $gpFlags . $gzType . $dosTime. $fileCRC32
+		. pack("VVv", $gzLength, $dataLength, strlen($filePath) ); // File name length
 
 		$zipEntry  = self::ZIP_LOCAL_FILE_HEADER;
 		$zipEntry .= self::ATTR_VERSION_TO_EXTRACT;
-		$zipEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
-		$zipEntry .= pack("VV", $gzLength, $dataLength);
-		$zipEntry .= pack("v", strlen($filePath) ); // File name length
-		$zipEntry .= $this->addExtraFields ? "\x10\x00" : "\x00\x00"; // Extra field length
+		$zipEntry .= $header;
+		$zipEntry .= $this->addExtraField ? "\x1C\x00" : "\x00\x00"; // Extra field length
 		$zipEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraFields) {
-			$zipEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
-			$zipEntry .= "\x0c\x00";   			// TSize	Short	total data size for this block
-			$zipEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
-			$zipEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
-			$zipEntry .= "\x00\x00\x00\x00";
+		if ($this->addExtraField) {
+			$zipEntry .= "\x55\x54\x09\x00\x03" . $tsPack . $tsPack . $ux;
 		}
 
-		if (!is_resource($this->zipFile)) {
-			$this->zipData .= $zipEntry;
-		} else {
-			fwrite($this->zipFile, $zipEntry);
-		}
+		$this->zipwrite($zipEntry);
 
 		$cdEntry  = self::ZIP_CENTRAL_FILE_HEADER;
 		$cdEntry .= self::ATTR_MADE_BY_VERSION;
-		$cdEntry .= self::ATTR_VERSION_TO_EXTRACT;
-		$cdEntry .= $gpFlags . $gzType . $dosTime. $fileCRC32;
-		$cdEntry .= pack("VV", $gzLength, $dataLength);
-		$cdEntry .= pack("v", strlen($filePath)); // Filename length
-		$cdEntry .= $this->addExtraFields ? "\x0c\x00" : "\x00\x00"; // Extra field length
+		$cdEntry .= ($dataLength === 0 ? "\x0A\x00" : self::ATTR_VERSION_TO_EXTRACT);
+		$cdEntry .= $header;
+		$cdEntry .= $this->addExtraField ? "\x18\x00" : "\x00\x00"; // Extra field length
 		$cdEntry .= pack("v", $fileCommentLength); // File comment length
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
@@ -568,11 +592,8 @@ class Zip {
 		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
-		if ($this->addExtraFields) {
-			$cdEntry .= "\x55\x58"; 			// 0x5855	Short	tag for this extra block type ("UX")
-			$cdEntry .= "\x08\x00";   			// TSize	Short	total data size for this block
-			$cdEntry .= pack("V", $timestamp);	// AcTime	Long	time of last access (UTC/GMT)
-			$cdEntry .= pack("V", $timestamp);	// ModTime	Long	time of last modification (UTC/GMT)
+		if ($this->addExtraField) {
+			$cdEntry .= "\x55\x54\x05\x00\x03" . $tsPack . $ux;
 		}
 
 		if (!empty($fileComment)) {
@@ -581,6 +602,23 @@ class Zip {
 
 		$this->cdRec[] = $cdEntry;
 		$this->offset += strlen($zipEntry) + $gzLength;
+	}
+
+	private function zipwrite($data) {
+		if (!is_resource($this->zipFile)) {
+			$this->zipData .= $data;
+		} else {
+			fwrite($this->zipFile, $data);
+			fflush($this->zipFile);
+		}
+	}
+
+	private function zipflush() {
+		if (!is_resource($this->zipFile)) {
+			$this->zipFile = tmpfile();
+			fwrite($this->zipFile, $this->zipData);
+			$this->zipData = NULL;
+		}
 	}
 
 	/**
