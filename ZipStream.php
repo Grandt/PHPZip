@@ -121,12 +121,12 @@ class ZipStream {
 		if ($this->isFinalized) {
 			return FALSE;
 		}
-		
+
 		$length = strlen($directoryPath);
 		if (substr($haystack, 0, $length) !== '/') {
 			$directoryPath = $directoryPath . "/";
 		}
-		
+
 		$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
 
 		return TRUE;
@@ -190,7 +190,7 @@ class ZipStream {
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
 	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
-		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
+		if (is_file($realPath) && !isset($addedFiles[realpath($realPath)])) {
 			if (is_dir($realPath)) {
 				$this->addDirectory($zipPath);
 			}
@@ -205,7 +205,7 @@ class ZipStream {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(file_exists($newRealPath) && ($folowSymliks === TRUE || !is_link($newRealPath))) {
+				if(is_file($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
@@ -233,7 +233,7 @@ class ZipStream {
 			return FALSE;
 		}
 
-		if (is_string($dataFile) && file_exists($dataFile)) {
+		if (is_string($dataFile) && is_file($dataFile)) {
 			$this->processFile($dataFile, $filePath, $timestamp, $fileComment);
 		} else if (is_resource($dataFile) && get_resource_type($dataFile) == "stream") {
 			$fh = $dataFile;
@@ -259,7 +259,7 @@ class ZipStream {
 		if ( !function_exists('sys_get_temp_dir')) {
 			die ("ERROR: Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
 		}
-		
+
 		if ($this->isFinalized) {
 			return FALSE;
 		}
@@ -312,7 +312,7 @@ class ZipStream {
 		fclose($this->streamData);
 
 		$this->processFile($this->streamFile, $this->streamFilePath, $this->streamTimestamp, $this->streamFileComment);
-		
+
 		$this->streamData = null;
 		$this->streamFilePath = null;
 		$this->streamTimestamp = null;
@@ -394,7 +394,7 @@ class ZipStream {
 			print(self::ZIP_END_OF_CENTRAL_DIRECTORY);
 			print($cdRecSize.$cdRecSize);
 			print(pack("VV", strlen($cd), $this->offset));
-			if (!is_null($this->zipComment)) {
+			if (!empty($this->zipComment)) {
 				print(pack("v", strlen($this->zipComment)));
 				print($this->zipComment);
 			} else {
@@ -446,7 +446,7 @@ class ZipStream {
 	 */
 	private function buildZipEntry($filePath, $fileComment, $gpFlags, $gzType, $timestamp, $fileCRC32, $gzLength, $dataLength, $extFileAttr) {
 		$filePath = str_replace("\\", "/", $filePath);
-		$fileCommentLength = (is_null($fileComment) ? 0 : strlen($fileComment));
+		$fileCommentLength = (empty($fileComment) ? 0 : strlen($fileComment));
 		$timestamp = (int)$timestamp;
 		$timestamp = ($timestamp == 0 ? time() : $timestamp);
 
@@ -486,7 +486,7 @@ class ZipStream {
 			$cdEntry .= "\x55\x54\x05\x00\x03" . $tsPack . $ux;
 		}
 
-		if (!is_null($fileComment)) {
+		if (!empty($fileComment)) {
 			$cdEntry .= $fileComment; // Comment
 		}
 
@@ -517,7 +517,7 @@ class ZipStream {
 	 */
 	public static function getRelativePath($path) {
 		$path = preg_replace("#/+\.?/+#", "/", str_replace("\\", "/", $path));
-		$dirs = explode("/", rtrim(preg_replace('#^(\./)+#', '', $path), '/'));
+		$dirs = explode("/", rtrim(preg_replace('#^(?:\./)+#', '', $path), '/'));
 
 		$offset = 0;
 		$sub = 0;
