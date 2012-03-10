@@ -25,18 +25,18 @@ class ZipStream {
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
 	const ZIP_END_OF_CENTRAL_DIRECTORY = "\x50\x4b\x05\x06\x00\x00\x00\x00"; //end of Central directory record
 
-	const EXT_FILE_ATTR_DIR = "\x10\x00\xFF\x41"; // "\x10\x40\xed\x41"; // Unix : Dir + mod:755
-	const EXT_FILE_ATTR_FILE = "\x00\x00\xFF\x81"; // "\x00\x40\xa4\x81"; // Unix : File + mod:644
+	const EXT_FILE_ATTR_DIR = "\x10\x00\xFF\x41";
+	const EXT_FILE_ATTR_FILE = "\x00\x00\xFF\x81";
 
-	const ATTR_VERSION_TO_EXTRACT = "\x14\x00"; // "\x0A\x00"; // Version needed to extract
-	const ATTR_MADE_BY_VERSION = "\x1E\x03";// "\x15\x03"; // Made By Version
+	const ATTR_VERSION_TO_EXTRACT = "\x14\x00"; // Version needed to extract
+	const ATTR_MADE_BY_VERSION = "\x1E\x03"; // Made By Version
 
 	private $zipMemoryThreshold = 1048576; // Autocreate tempfile if the zip data exceeds 1048576 bytes (1 MB)
 
 	private $zipComment = null;
 	private $cdRec = array(); // central directory
 	private $offset = 0;
-	private $isFinalized = false;
+	private $isFinalized = FALSE;
 	private $addExtraField = TRUE;
 
 	private $streamChunkSize = 16384; // 65536;
@@ -46,8 +46,6 @@ class ZipStream {
 	private $streamFile = null;
 	private $streamData = null;
 	private $streamFileLength = 0;
-
-	private static $CRC32Table, $Reflect8Table;
 
 	/**
 	 * Constructor.
@@ -60,10 +58,7 @@ class ZipStream {
 			die ("ERROR: ZipStream " . self::VERSION . " requires PHP version 5.2.1 or above.");
 		}
 		if (!headers_sent($headerFile, $headerLine) or die("<p><strong>Error:</strong> Unable to send file $archiveName. HTML Headers have already been sent from <strong>$headerFile</strong> in line <strong>$headerLine</strong></p>")) {
-
-			$this->initializeCRC32tables();
-
-			if ((ob_get_contents() === false || ob_get_contents() == '') or die("\n<p><strong>Error:</strong> Unable to send file <strong>$archiveName.epub</strong>. Output buffer contains the following text (typically warnings or errors):<br>" . ob_get_contents() . "</p>")) {
+			if ((ob_get_contents() === FALSE || ob_get_contents() == '') or die("\n<p><strong>Error:</strong> Unable to send file <strong>$archiveName.epub</strong>. Output buffer contains the following text (typically warnings or errors):<br>" . ob_get_contents() . "</p>")) {
 				if (ini_get('zlib.output_compression')) {
 					ini_set('zlib.output_compression', 'Off');
 				}
@@ -82,38 +77,10 @@ class ZipStream {
 	}
 
 	function __destruct() {
-		$this->isFinalized = true;
+		$this->isFinalized = TRUE;
 		$cd = null;
 		$this->cdRec = null;
 		exit;
-	}
-
-	private function initializeCRC32tables() {
-		if (!isset($this->CRC32Table)) {
-			$Polynomial = 0x04c11db7;
-			$topBit = 1 << 31;
-
-			for($i = 0; $i < 256; $i++) {
-				$remainder = $i << 24;
-				for ($j = 0; $j < 8; $j++) {
-					if ($remainder & $topBit) {
-						$remainder = ($remainder << 1) ^ $Polynomial;
-					} else {
-						$remainder = $remainder << 1;
-					}
-				}
-
-				$this->CRC32Table[$i] = $remainder;
-
-				if (isset($this->Reflect8Table[$i])) {
-					continue;
-				}
-				$str = str_pad(decbin($i), 8, '0', STR_PAD_LEFT);
-				$num = bindec(strrev($str));
-				$this->Reflect8Table[$i] = $num;
-				$this->Reflect8Table[$num] = $i;
-			}
-		}
 	}
 
 	/**
@@ -134,11 +101,11 @@ class ZipStream {
 	 */
 	public function setComment($newComment = null) {
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
 		$this->zipComment = $newComment;
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -152,16 +119,17 @@ class ZipStream {
 	 */
 	public function addDirectory($directoryPath, $timestamp = 0, $fileComment = null) {
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
 		
 		$length = strlen($directoryPath);
 		if (substr($haystack, 0, $length) !== '/') {
 			$directoryPath = $directoryPath . "/";
 		}
+		
 		$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -175,16 +143,16 @@ class ZipStream {
 	 */
 	public function addFile($data, $filePath, $timestamp = 0, $fileComment = null)   {
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
 
 		if (is_resource($data) && get_resource_type($data) == "stream") {
 			$this->addLargeFile($data, $filePath, $timestamp, $fileComment);
-			return false;
+			return FALSE;
 		}
 
 		$gzType = "\x08\x00"; // Compression type 8 = deflate
-		$gpFlags = "\x00\x00"; // "\x02\x00"; // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
+		$gpFlags = "\x00\x00"; // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
 		$dataLength = strlen($data);
 		$fileCRC32 = pack("V", crc32($data));
 
@@ -204,7 +172,7 @@ class ZipStream {
 
 		print ($gzData);
 
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -262,21 +230,21 @@ class ZipStream {
 	 */
 	public function addLargeFile($dataFile, $filePath, $timestamp = 0, $fileComment = null)   {
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
-
-		$fh = null;
 
 		if (is_string($dataFile) && file_exists($dataFile)) {
 			$this->processFile($dataFile, $filePath, $timestamp, $fileComment);
 		} else if (is_resource($dataFile) && get_resource_type($dataFile) == "stream") {
 			$fh = $dataFile;
+			$this->openStream($filePath, $timestamp, $fileComment);
+
 			while(!feof($fh)) {
 				$this->addStreamData(fread($fh, $this->streamChunkSize));
 			}
 			$this->closeStream($this->addExtraField);
 		}
-		return true;
+		return TRUE;
 	}
 
 	/**
@@ -288,8 +256,12 @@ class ZipStream {
 	 * @return bool $success
 	 */
 	public function openStream($filePath, $timestamp = 0, $fileComment = null)   {
+		if ( !function_exists('sys_get_temp_dir')) {
+			die ("ERROR: Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
+		}
+		
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
 
 		if (strlen($this->streamFilePath) > 0) {
@@ -302,20 +274,19 @@ class ZipStream {
 		$this->streamTimestamp = $timestamp;
 		$this->streamFileComment = $fileComment;
 		$this->streamFileLength = 0;
-		$this->remainder = 0xffffffff;
 
-		return true;
+		return TRUE;
 	}
 
 	/**
 	 * Add data to the open stream.
 	 *
 	 * @param String $data
-	 * @return $length bytes added or false if the archive is finalized or there are no open stream.
+	 * @return $length bytes added or FALSE if the archive is finalized or there are no open stream.
 	 */
 	public function addStreamData($data) {
 		if ($this->isFinalized || strlen($this->streamFilePath) == 0) {
-			return false;
+			return FALSE;
 		}
 
 		$length = fwrite($this->streamData, $data, strlen($data));
@@ -334,7 +305,7 @@ class ZipStream {
 	 */
 	public function closeStream() {
 		if ($this->isFinalized || strlen($this->streamFilePath) == 0) {
-			return false;
+			return FALSE;
 		}
 
 		fflush($this->streamData);
@@ -353,12 +324,12 @@ class ZipStream {
 
 		$this->streamFile = null;
 
-		return true;
+		return TRUE;
 	}
 
 	private function processFile($dataFile, $filePath, $timestamp = 0, $fileComment = null) {
 		if ($this->isFinalized) {
-			return false;
+			return FALSE;
 		}
 
 		$tempzip = tempnam(sys_get_temp_dir(), 'ZipStream');
@@ -432,13 +403,13 @@ class ZipStream {
 
 			flush();
 
-			$this->isFinalized = true;
+			$this->isFinalized = TRUE;
 			$cd = null;
 			$this->cdRec = null;
 
-			return true;
+			return TRUE;
 		}
-		return false;
+		return FALSE;
 	}
 
 	/**
