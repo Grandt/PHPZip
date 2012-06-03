@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------
+Rev. 1.33 - 2012-05-03
+* Fixed: Issue where addDirectory with trailing slashes would create empty, zero length names as subdirectories.
+
+* Misc: Code cleanup
+---------------------------------------------------------------------
 Rev. 1.32 - 2012-03-08
 * Fixed: Empty directories work as well now.
 
