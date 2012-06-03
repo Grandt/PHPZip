@@ -12,14 +12,15 @@
  * and
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
- * @author A. Grandt
- * @copyright A. Grandt 2010-2012
+ * @author A. Grandt <php@grandt.com>
+ * @copyright 2009-2012 A. Grandt
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
- * @link http://www.phpclasses.org/package/6616
- * @version 1.32
+ * @link http://www.phpclasses.org/package/6116
+ * @link https://github.com/Grandt/PHPZip
+ * @version 1.33
  */
 class ZipStream {
-	const VERSION = 1.32;
+	const VERSION = 1.33;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -50,11 +51,11 @@ class ZipStream {
 	/**
 	 * Constructor.
 	 *
-	 * @param $archiveName String. Name to send to the HTTP client.
+	 * @param String $archiveName Name to send to the HTTP client.
 	 * @param String $contentType Content mime type. Optional, defaults to "application/zip".
 	 */
 	function __construct($archiveName = "", $contentType = "application/zip") {
-		if ( !function_exists('sys_get_temp_dir')) {
+		if (!function_exists('sys_get_temp_dir')) {
 			die ("ERROR: ZipStream " . self::VERSION . " requires PHP version 5.2.1 or above.");
 		}
 		if (!headers_sent($headerFile, $headerLine) or die("<p><strong>Error:</strong> Unable to send file $archiveName. HTML Headers have already been sent from <strong>$headerFile</strong> in line <strong>$headerLine</strong></p>")) {
@@ -69,7 +70,7 @@ class ZipStream {
 				header("Accept-Ranges: bytes");
 				header("Connection: close");
 				header("Content-Type: " . $contentType);
-				header('Content-Disposition: attachment; filename="' . $archiveName . '";' );
+				header('Content-Disposition: attachment; filename="' . $archiveName . '";');
 				header("Content-Transfer-Encoding: binary");
 				flush();
 			}
@@ -122,14 +123,14 @@ class ZipStream {
 			return FALSE;
 		}
 
-		$length = strlen($directoryPath);
-		if (substr($haystack, 0, $length) !== '/') {
-			$directoryPath = $directoryPath . "/";
+		$directoryPath = str_replace("\\", "/", $directoryPath);
+		$directoryPath = rtrim($directoryPath, "/");
+
+		if (strlen($directoryPath) > 0) {
+			$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
+			return TRUE;
 		}
-
-		$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
-
-		return TRUE;
+		return FALSE;
 	}
 
 	/**
@@ -157,7 +158,7 @@ class ZipStream {
 		$fileCRC32 = pack("V", crc32($data));
 
 		$gzData = gzcompress($data);
-		$gzData = substr( substr($gzData, 0, strlen($gzData) - 4), 2); // gzcompress adds a 2 byte header and 4 byte CRC we can't use.
+		$gzData = substr(substr($gzData, 0, strlen($gzData) - 4), 2); // gzcompress adds a 2 byte header and 4 byte CRC we can't use.
 		// The 2 byte header does contain useful data, though in this case the 2 parameters we'd be interrested in will always be 8 for compression type, and 2 for General purpose flag.
 		$gzLength = strlen($gzData);
 
@@ -185,7 +186,7 @@ class ZipStream {
 	 * @param String $zipPath        Filepath and name to be used in the archive.
 	 * @param bool   $recursive      Add content recursively, default is TRUE.
 	 * @param bool   $followSymlinks Follow and add symbolic links, if they are accessible, default is TRUE.
-	 * @param array  $addedFiles     Reference to the added files, this is used to prevent duplicates, efault is an empty array.
+	 * @param array &$addedFiles     Reference to the added files, this is used to prevent duplicates, efault is an empty array.
 	 *                               If you start the function by parsing an array, the array will be populated with the realPath
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
@@ -205,7 +206,7 @@ class ZipStream {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if(is_file($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
+				if (is_file($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
@@ -239,7 +240,7 @@ class ZipStream {
 			$fh = $dataFile;
 			$this->openStream($filePath, $timestamp, $fileComment);
 
-			while(!feof($fh)) {
+			while (!feof($fh)) {
 				$this->addStreamData(fread($fh, $this->streamChunkSize));
 			}
 			$this->closeStream($this->addExtraField);
@@ -256,7 +257,7 @@ class ZipStream {
 	 * @return bool $success
 	 */
 	public function openStream($filePath, $timestamp = 0, $fileComment = null)   {
-		if ( !function_exists('sys_get_temp_dir')) {
+		if (!function_exists('sys_get_temp_dir')) {
 			die ("ERROR: Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
 		}
 
@@ -360,7 +361,7 @@ class ZipStream {
 		fseek($file_handle, 34);
 		$pos = 34;
 
-		while(!feof($file_handle)) {
+		while (!feof($file_handle)) {
 			$data = fread($file_handle, $this->streamChunkSize);
 			$datalen = strlen($data);
 			if ($datalen+$pos > $eof) {
@@ -382,7 +383,7 @@ class ZipStream {
 	 * @return bool $success
 	 */
 	public function finalize() {
-		if(!$this->isFinalized) {
+		if (!$this->isFinalized) {
 			if (strlen($this->streamFilePath) > 0) {
 				$this->closeStream();
 			}
@@ -456,7 +457,7 @@ class ZipStream {
 		$ux = "\x75\x78\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00";
 
 		$header = $gpFlags . $gzType . $dosTime. $fileCRC32
-		. pack("VVv", $gzLength, $dataLength, strlen($filePath) ); // File name length
+		. pack("VVv", $gzLength, $dataLength, strlen($filePath)); // File name length
 
 		$zipEntry  = self::ZIP_LOCAL_FILE_HEADER;
 		$zipEntry .= self::ATTR_VERSION_TO_EXTRACT;
@@ -479,7 +480,7 @@ class ZipStream {
 		$cdEntry .= "\x00\x00"; // Disk number start
 		$cdEntry .= "\x00\x00"; // internal file attributes
 		$cdEntry .= $extFileAttr; // External file attributes
-		$cdEntry .= pack("V", $this->offset ); // Relative offset of local header
+		$cdEntry .= pack("V", $this->offset); // Relative offset of local header
 		$cdEntry .= $filePath; // FileName
 		// Extra fields
 		if ($this->addExtraField) {
@@ -512,7 +513,7 @@ class ZipStream {
 	 * If the path starts with a "/", it is deemed an absolute path and any /../ in the beginning is stripped off.
 	 * The returned path will not end in a "/".
 	 *
-	 * @param String $relPath The path to clean up
+	 * @param String $path The path to clean up
 	 * @return String the clean path
 	 */
 	public static function getRelativePath($path) {
@@ -533,7 +534,7 @@ class ZipStream {
 		}
 
 		$newDirs = array();
-		foreach($dirs as $dir) {
+		foreach ($dirs as $dir) {
 			if ($dir !== "..") {
 				$subOffset--;
 				$newDirs[++$offset] = $dir;
