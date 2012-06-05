@@ -17,10 +17,10 @@
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.33
+ * @version 1.34
  */
 class ZipStream {
-	const VERSION = 1.33;
+	const VERSION = 1.34;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -58,6 +58,9 @@ class ZipStream {
 		if (!function_exists('sys_get_temp_dir')) {
 			die ("ERROR: ZipStream " . self::VERSION . " requires PHP version 5.2.1 or above.");
 		}
+
+		$headerFile = null;
+		$headerLine = null;
 		if (!headers_sent($headerFile, $headerLine) or die("<p><strong>Error:</strong> Unable to send file $archiveName. HTML Headers have already been sent from <strong>$headerFile</strong> in line <strong>$headerLine</strong></p>")) {
 			if ((ob_get_contents() === FALSE || ob_get_contents() == '') or die("\n<p><strong>Error:</strong> Unable to send file <strong>$archiveName.epub</strong>. Output buffer contains the following text (typically warnings or errors):<br>" . ob_get_contents() . "</p>")) {
 				if (ini_get('zlib.output_compression')) {
@@ -79,7 +82,6 @@ class ZipStream {
 
 	function __destruct() {
 		$this->isFinalized = TRUE;
-		$cd = null;
 		$this->cdRec = null;
 		exit;
 	}
@@ -191,7 +193,7 @@ class ZipStream {
 	 *                               and zipPath kay/value pairs added to the archive by the function.
 	 */
 	public function addDirectoryContent($realPath, $zipPath, $recursive = TRUE, $followSymlinks = TRUE, &$addedFiles = array()) {
-		if (is_file($realPath) && !isset($addedFiles[realpath($realPath)])) {
+		if (file_exists($realPath) && !isset($addedFiles[realpath($realPath)])) {
 			if (is_dir($realPath)) {
 				$this->addDirectory($zipPath);
 			}
@@ -206,7 +208,7 @@ class ZipStream {
 				$newRealPath = $file->getPathname();
 				$newZipPath = self::pathJoin($zipPath, $file->getFilename());
 
-				if (is_file($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
+				if (file_exists($newRealPath) && ($followSymlinks === TRUE || !is_link($newRealPath))) {
 					if ($file->isFile()) {
 						$addedFiles[realpath($newRealPath)] = $newZipPath;
 						$this->addLargeFile($newRealPath, $newZipPath);
