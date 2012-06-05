@@ -13,10 +13,10 @@
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6110
  * @link https://github.com/Grandt/PHPZip
- * @version 1.34
+ * @version 1.35
  */
 class Zip {
-	const VERSION = 1.34;
+	const VERSION = 1.35;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -138,7 +138,7 @@ class Zip {
 		$directoryPath = rtrim($directoryPath, "/");
 
 		if (strlen($directoryPath) > 0) {
-			$this->buildZipEntry($directoryPath, $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
+			$this->buildZipEntry($directoryPath.'/', $fileComment, "\x00\x00", "\x00\x00", $timestamp, "\x00\x00\x00\x00", 0, 0, self::EXT_FILE_ATTR_DIR);
 			return TRUE;
 		}
 		return FALSE;
