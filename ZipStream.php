@@ -17,10 +17,10 @@
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.35
+ * @version 1.36
  */
 class ZipStream {
-	const VERSION = 1.35;
+	const VERSION = 1.36;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -363,19 +363,17 @@ class ZipStream {
 		fseek($file_handle, 34);
 		$pos = 34;
 
-		while (!feof($file_handle)) {
-			$data = fread($file_handle, $this->streamChunkSize);
-			$datalen = strlen($data);
-			if ($datalen+$pos > $eof) {
+		while (!feof($file_handle) && $pos < $eof) {
+			$datalen = $this->streamChunkSize;
+			if ($pos + $this->streamChunkSize > $eof) {
 				$datalen = $eof-$pos;
-				$data = substr($data, 0, $datalen);
 			}
+			echo fread($file_handle, $datalen);
 			$pos += $datalen;
-			print $data;
+			flush();
 		}
 
 		fclose($file_handle);
-
 		unlink($tempzip);
 	}
 

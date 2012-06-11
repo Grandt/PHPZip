@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------
+Rev. 1.36 - 2012-06-11
+* Updated: processFile have been updated for performance.
+* Updated: README with a warning to not use, or at least disable PHP output buffering.
+---------------------------------------------------------------------
+Rev. 1.35 - 2012-06-05
+* Fixed: new bug that caused addDirectory to create invalid Zip entries
+---------------------------------------------------------------------
 Rev. 1.34 - 2012-06-05
 * Fixed: Regression error, where addDirectoryContent would no longer add the given directory.
 ---------------------------------------------------------------------
