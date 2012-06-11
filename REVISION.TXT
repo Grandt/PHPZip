@@ -2,6 +2,8 @@
 Rev. 1.36 - 2012-06-11
 * Updated: processFile have been updated for performance.
 * Updated: README with a warning to not use, or at least disable PHP output buffering.
+
+NOTE: Please ensure that output buffering is disabled when using especially ZipStream. It defeats the purpose of the class, and large zip files may cause a memory exceeded exception.
 ---------------------------------------------------------------------
 Rev. 1.35 - 2012-06-05
 * Fixed: new bug that caused addDirectory to create invalid Zip entries
