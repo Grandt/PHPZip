@@ -26,8 +26,8 @@ if ($handle) {
 
 // Add a directory, first recursively, then the same directory, but without recursion.
 // Naturally this requires you to change the path to ../test to point to a directory of your own.
-$zip->addDirectoryContent("../test", "recursiveDir/test");
-$zip->addDirectoryContent("../test", "recursiveDir/testFlat", FALSE);
+$zip->addDirectoryContent("testData/test", "recursiveDir/test");
+$zip->addDirectoryContent("testData/test", "recursiveDir/testFlat", FALSE);
 
 $zip->sendZip("ZipExample1.zip");
 ?>

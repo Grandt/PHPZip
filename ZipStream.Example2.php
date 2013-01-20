@@ -9,16 +9,13 @@ include_once("ZipStream.php");
 
 $zip = new ZipStream("test.zip"); 
 
-?> 
-<?php
-
 /*
  * As seen in the output, the above construct with a PHP end and start tag after
  * creating the ZipStream is a bad idea. The Zip file will be starting with a
  * space followed by the newline characters.
  */
 $zip->addDirectory("test");
-$zip->addDirectoryContent("../test","test");
+$zip->addDirectoryContent("testData/test","test");
 return $zip->finalize();
 
 ?>

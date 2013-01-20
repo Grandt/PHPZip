@@ -382,8 +382,11 @@ class Zip {
 			if ($pos + $this->streamChunkSize > $eof) {
 				$datalen = $eof-$pos;
 			}
-			echo fread($file_handle, $datalen);
+			$data = fread($file_handle, $datalen);
 			$pos += $datalen;
+
+			$this->zipwrite($data);
+			
 			flush();
 		}
 

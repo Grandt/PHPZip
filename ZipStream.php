@@ -71,7 +71,7 @@ class ZipStream {
 				header("Last-Modified: " . gmdate("D, d M Y H:i:s T"));
 				header("Expires: 0");
 				header("Accept-Ranges: bytes");
-				header("Connection: close");
+				//header("Connection: Keep-Alive");
 				header("Content-Type: " . $contentType);
 				header('Content-Disposition: attachment; filename="' . $archiveName . '";');
 				header("Content-Transfer-Encoding: binary");

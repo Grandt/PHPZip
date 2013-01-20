@@ -40,3 +40,4 @@ org.eclipse.*
 ehthumbs.db
 Icon?
 Thumbs.db
+/testData
