@@ -13,14 +13,14 @@
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
  * @author A. Grandt <php@grandt.com>
- * @copyright 2009-2012 A. Grandt
+ * @copyright 2009-2013 A. Grandt
  * @license GNU LGPL, Attribution required for commercial implementations, requested for everything else.
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.36
+ * @version 1.37
  */
 class ZipStream {
-	const VERSION = 1.36;
+	const VERSION = 1.37;
 
 	const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
 	const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -456,6 +456,13 @@ class ZipStream {
 
 		$ux = "\x75\x78\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00";
 
+		$isFileUTF8 = mb_check_encoding($filePath, "UTF-8") && !mb_check_encoding($filePath, "ASCII");
+		$isCommentUTF8 = !empty($fileComment) && mb_check_encoding($fileComment, "UTF-8") && !mb_check_encoding($fileComment, "ASCII");
+		if ($isFileUTF8 || $isCommentUTF8) {
+			$gpFlagsV = unpack("v", $gpFlags);
+			$gpFlags = pack("v", $gpFlagsV[0] | (1 << 11));
+		}
+		
 		$header = $gpFlags . $gzType . $dosTime. $fileCRC32
 		. pack("VVv", $gzLength, $dataLength, strlen($filePath)); // File name length
 

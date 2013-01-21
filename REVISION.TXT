@@ -1,4 +1,7 @@
 ---------------------------------------------------------------------
+Rev. 1.37 - 2013-01-21
+* Added: Support for UTF-8 characters in file paths. The class will detect Multibyte paths strings and assume they are UTF-8, it is up to the user to ensure this is the case.
+---------------------------------------------------------------------
 Rev. 1.36 - 2012-06-11
 * Updated: processFile have been updated for performance.
 * Updated: README with a warning to not use, or at least disable PHP output buffering.

@@ -10,6 +10,7 @@ ZipStream has much of the same features and functions of Zip.php, with a few not
 See the examples for example usage. The php files have "some" doumentation in them in the form of Javadoc style function headers.
 
 NOTE: Please ensure that output buffering is disabled when using especially ZipStream. It defeats the purpose of the class, and large zip files may cause a memory exceeded exception.
+NOTE2: THe Zip and ZipStream classes support UTF-8 in file paths and file comments, and will autodetect UTF-8 strings to that end, however it is up to the user to ensure that other Multibyte chracter sets aren't sent to the class.
 
 TODO: 
 * Add compression level (at least "compress or store") to ZipStream, and to the Large file option on Zip.php
