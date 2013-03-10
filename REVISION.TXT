@@ -1,4 +1,7 @@
 ---------------------------------------------------------------------
+Rev. 1.38 - 2013-03-09
+* Added: Parameter $compress to addFile. A boolean which when set to FALSE will store the added data, rather than attempt to compress it. Good for already compressed files such as images and other multimedia types.
+---------------------------------------------------------------------
 Rev. 1.37 - 2013-01-21
 * Added: Support for UTF-8 characters in file paths. The class will detect Multibyte paths strings and assume they are UTF-8, it is up to the user to ensure this is the case.
 ---------------------------------------------------------------------
@@ -22,10 +25,10 @@ Rev. 1.33 - 2012-06-03
 Rev. 1.32 - 2012-03-08
 * Fixed: Empty directories work as well now.
 
-* Note: The large file handling were practically entirely rewritten. This adds an additional dependency to the class, that the PHP Zip package must be available. 
+* Note: The large file handling were practically entirely rewritten. This adds an additional dependency to the class, that the PHP Zip package must be available.
 ---------------------------------------------------------------------
 Rev. 1.31 - 2012-03-01
-* Fixed: Mac OSX default Archive Utility should now be able to load the files produced by this utility. 
+* Fixed: Mac OSX default Archive Utility should now be able to load the files produced by this utility.
 ---------------------------------------------------------------------
 Rev. 1.30 - 2012-01-21
 * Fixed: Issue #3, Error in TimeZone handling.
@@ -54,7 +57,7 @@ Rev. 1.26 - 2011-07-03
 * Fixed: Problem with opening Zip files on Mac. http://www.phpclasses.org/discuss/package/6616/thread/4/
 ---------------------------------------------------------------------
 Rev. 1.25 - 2011-03-14
-* Fixed: Directory duplication in some circumstances caused by addDirectoryContent being called with an empty $zipPath argument. 
+* Fixed: Directory duplication in some circumstances caused by addDirectoryContent being called with an empty $zipPath argument.
 
 * Fixed: getRelativePath returned absolute paths for relative paths and vice versa.
 ---------------------------------------------------------------------
@@ -77,5 +80,5 @@ Rev. 1.20 - 2011-02-19
 (for ZipStream.php)
 * Changed: The constructor now have the optional parameter $contentType, defaulting to "application/zip". This is the mimetype of the archive to be sent, useful for file types using Zip as a container, like ePub, CBZ and ODF.
 ---------------------------------------------------------------------
-Rev. 1.00 
+Rev. 1.00
 Initial release

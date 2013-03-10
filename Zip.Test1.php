@@ -21,6 +21,6 @@ $zip->addFile("你好 2", "你好 2.txt", 0, "Hello 1");
 $zip->addFile("你好 2", "你好 3.txt", 0, "Hello 你好");
 $zip->addFile("你好 3", "你好/hello.txt");
 $zip->addFile("你好 4", "你好/你好.txt");
-	
+    
 $zip->sendZip("Zip.Test6.zip");
 ?>

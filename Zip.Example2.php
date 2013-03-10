@@ -14,15 +14,15 @@ $zip->addFile("Hello World!", "hello.txt");
 
 @$handle = opendir($fileDir);
 if ($handle) {
-	/* This is the correct way to loop over the directory. */
-	while (false !== ($file = readdir($handle))) {
-		if (strpos($file, ".html") !== false) {
-			$pathData = pathinfo($fileDir . $file);
-			$fileName = $pathData['filename'];
+    /* This is the correct way to loop over the directory. */
+    while (false !== ($file = readdir($handle))) {
+        if (strpos($file, ".html") !== false) {
+            $pathData = pathinfo($fileDir . $file);
+            $fileName = $pathData['filename'];
 
-			$zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file));
-		}
-	}
+            $zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file));
+        }
+    }
 }
 
 $zip->finalize(); // as we are not using getZipData or getZipFile, we need to call finalize ourselves.

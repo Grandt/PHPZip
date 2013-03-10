@@ -7,7 +7,7 @@
  */
 include_once("ZipStream.php");
 
-$zip = new ZipStream("test.zip"); 
+$zip = new ZipStream("test.zip");
 
 /*
  * As seen in the output, the above construct with a PHP end and start tag after

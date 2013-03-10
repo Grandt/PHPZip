@@ -29,11 +29,11 @@ $zip->closeStream();
 
 // For this test you need to create a large text file called "big one1.txt"
 if (file_exists("big one1.txt")) {
-	$zip->addLargeFile("big one1.txt", "big one2a.txt");
+    $zip->addLargeFile("big one1.txt", "big one2a.txt");
 
-	$fhandle = fopen("big one1.txt", "rb");
-	$zip->addLargeFile($fhandle, "big one2b.txt");
-	fclose($fhandle);
+    $fhandle = fopen("big one1.txt", "rb");
+    $zip->addLargeFile($fhandle, "big one2b.txt");
+    fclose($fhandle);
 }
 
 $zip->addDirectory("Empty Dir");
@@ -42,12 +42,12 @@ $zip->addDirectory("Empty Dir");
 $fileDir = './';
 @$handle = opendir($fileDir);
 if ($handle) {
-	/* This is the correct way to loop over the directory. */
-	while (false !== ($file = readdir($handle))) {
-		if (($file != '.') && ($file != '..') && is_file($file)) {
-			$zip->addLargeFile(($fileDir . $file), "dirTest/".$file, filectime($fileDir . $file));
-		}
-	}
+    /* This is the correct way to loop over the directory. */
+    while (false !== ($file = readdir($handle))) {
+        if (($file != '.') && ($file != '..') && is_file($file)) {
+            $zip->addLargeFile(($fileDir . $file), "dirTest/".$file, filectime($fileDir . $file));
+        }
+    }
 }
 
 // Add a directory, first recursively, then the same directory, but without recursion.
