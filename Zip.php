@@ -392,8 +392,6 @@ class Zip {
             $pos += $datalen;
 
             $this->zipwrite($data);
-            
-            flush();
         }
 
         fclose($file_handle);
