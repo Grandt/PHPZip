@@ -1,4 +1,7 @@
 ---------------------------------------------------------------------
+Rev. 1.39 - 2013-07-26
+* Fixed: "HTML Headers have already been sent from in line 0" when using addDirectoryContent
+---------------------------------------------------------------------
 Rev. 1.38 - 2013-03-09
 * Added: Parameter $compress to addFile. A boolean which when set to FALSE will store the added data, rather than attempt to compress it. Good for already compressed files such as images and other multimedia types.
 ---------------------------------------------------------------------
