@@ -17,10 +17,10 @@
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.38
+ * @version 1.40
  */
 class ZipStream {
-    const VERSION = 1.38;
+    const VERSION = 1.40;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -73,7 +73,7 @@ class ZipStream {
                 header("Accept-Ranges: bytes");
                 //header("Connection: Keep-Alive");
                 header("Content-Type: " . $contentType);
-                header('Content-Disposition: attachment; filename="' . $archiveName . '";');
+                header('Content-Disposition: attachment; filename="' . $archiveName . '"');
                 header("Content-Transfer-Encoding: binary");
                 flush();
             }
