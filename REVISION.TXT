@@ -1,4 +1,7 @@
 ---------------------------------------------------------------------
+Rev. 1.40 - 2013-09-16
+* Fixed: Trailing semicolon in the Content-Disposition file header caused trouble in some browsers
+---------------------------------------------------------------------
 Rev. 1.39 - 2013-07-26
 * Fixed: "HTML Headers have already been sent from in line 0" when using addDirectoryContent
 ---------------------------------------------------------------------

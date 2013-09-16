@@ -13,10 +13,10 @@
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6110
  * @link https://github.com/Grandt/PHPZip
- * @version 1.39
+ * @version 1.40
  */
 class Zip {
-    const VERSION = 1.39;
+    const VERSION = 1.40;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -496,7 +496,7 @@ class Zip {
                 header("Accept-Ranges: bytes");
                 header("Connection: close");
                 header("Content-Type: " . $contentType);
-                header('Content-Disposition: attachment; filename="' . $fileName . '";');
+                header('Content-Disposition: attachment; filename="' . $fileName . '"');
                 header("Content-Transfer-Encoding: binary");
                 header("Content-Length: ". $this->getArchiveSize());
 
