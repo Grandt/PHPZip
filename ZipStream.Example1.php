@@ -1,5 +1,9 @@
 <?php
-// Example. Zip all .html files in the current directory and save to current directory.
+error_reporting(E_ALL | E_STRICT);
+ini_set('error_reporting', E_ALL | E_STRICT);
+ini_set('display_errors', 1);
+//
+//// Example. Zip all .html files in the current directory and save to current directory.
 // Make a copy, also to the current dir, for good measure.
 //$mem = ini_get('memory_limit');
 $extime = ini_get('max_execution_time');
@@ -29,7 +33,7 @@ $zip->closeStream();
 
 // For this test you need to create a large text file called "big one1.txt"
 if (file_exists("big one1.txt")) {
-    $zip->addLargeFile("big one1.txt", "big one2a.txt");
+    $zip->addLargeFile("big one1.txt", "big one2a.txt", 0, null, ZipStream::getFileExtAttr("big one1.txt"));
 
     $fhandle = fopen("big one1.txt", "rb");
     $zip->addLargeFile($fhandle, "big one2b.txt");
@@ -55,6 +59,10 @@ if ($handle) {
 $zip->addDirectory("recursiveDir/");
 $zip->addDirectoryContent("../test", "recursiveDir/test");
 $zip->addDirectoryContent("../test", "recursiveDir/testFlat", FALSE);
-
+/*
+$addedFiles = array();
+$zip->addDirectoryContent("../test", "recursiveDir/testPermisssions", TRUE, TRUE, $addedFiles,
+			TRUE, ZipStream::generateExtAttr(4, 4, 0, FALSE), ZipStream::generateExtAttr(4, 4, 0, TRUE));
+*/
 $zip->finalize(); // Mandatory, needed to send the Zip files central directory structure.
 ?>
