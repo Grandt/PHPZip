@@ -1,34 +1,82 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html class="client-firefox client-firefox-3 client-gecko client-win" xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en"><head>
-
-
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en">
+<head>
 <title>ZIP (file format) - Wikipedia, the free encyclopedia</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Content-Style-Type" content="text/css">
-<meta name="generator" content="MediaWiki 1.17wmf1">
-<link rel="alternate" type="application/x-wiki" title="Edit this page" href="http://en.wikipedia.org/w/index.php?title=ZIP_%28file_format%29&amp;action=edit">
-<link rel="edit" title="Edit this page" href="http://en.wikipedia.org/w/index.php?title=ZIP_%28file_format%29&amp;action=edit">
-<link rel="apple-touch-icon" href="http://en.wikipedia.org/apple-touch-icon.png">
-<link rel="shortcut icon" href="http://en.wikipedia.org/favicon.ico">
-<link rel="search" type="application/opensearchdescription+xml" href="http://en.wikipedia.org/w/opensearch_desc.php" title="Wikipedia (en)">
-<link rel="EditURI" type="application/rsd+xml" href="http://en.wikipedia.org/w/api.php?action=rsd">
-<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/">
-<link rel="alternate" type="application/atom+xml" title="Wikipedia Atom feed" href="http://en.wikipedia.org/w/index.php?title=Special:RecentChanges&amp;feed=atom">
-<link rel="stylesheet" href="ZIP_%28file_format%29_files/load_002.css" type="text/css" media="all">
-<style type="text/css" media="all">.suggestions{overflow:hidden;position:absolute;top:0px;left:0px;width:0px;border:none;z-index:99;padding:0;margin:-1px -1px 0 0} html > body .suggestions{margin:-1px 0 0 0}.suggestions-special{position:relative;background-color:Window;font-size:0.8em;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}.suggestions-results{background-color:white;background-color:Window;font-size:0.8em;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0}.suggestions-result{color:black;color:WindowText;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left}.suggestions-result-current{background-color:#4C59A6;background-color:Highlight;color:white;color:HighlightText}.suggestions-special .special-label{font-size:0.8em;color:gray;text-align:left}.suggestions-special .special-query{color:black;font-style:italic;text-align:left}.suggestions-special .special-hover{background-color:silver}.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:white;color:HighlightText}.autoellipsis-matched,.highlight{font-weight:bold}
-
-/* cache key: enwiki:resourceloader:filter:minify-css:3:8d395f27880b6ffcab73b1c74b0217ea */</style><style type="text/css" media="all">#mw-panel.collapsible-nav div.portal{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAAABCAMAAAA7MLYKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEtQTFRF29vb2tra4ODg6urq5OTk4uLi6+vr7e3t7Ozs8PDw5+fn4+Pj4eHh3d3d39/f6Ojo5eXl6enp8fHx8/Pz8vLy7+/v3Nzc2dnZ2NjYnErj7QAAAD1JREFUeNq0wQUBACAMALDj7hf6JyUFGxzEnYhC9GaNPG1xVffGDErk/iCigLl1XV2xM49lfAxEaSM+AQYA9HMKuv4liFQAAAAASUVORK5CYII=);background-image:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/portal-break.png?2011-02-12T21:25:00Z)!ie;background-position:left top;background-repeat:no-repeat;padding:0.25em 0 !important;margin:-11px 9px 10px 11px}#mw-panel.collapsible-nav div.portal h5{color:#4D4D4D;font-weight:normal;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA9QTFRFeXl53d3dmpqasbGx////GU0iEgAAAAV0Uk5T/////wD7tg5TAAAAK0lEQVQI12NwgQIG0hhCDAwMTCJAhqMCA4MiWEoIJABiOCooQhULi5BqMgB2bh4svs8t+QAAAABJRU5ErkJggg==) left center no-repeat;background:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/open.png?2011-02-12T21:25:00Z) left center no-repeat!ie;padding:4px 0 3px 1.5em;margin-bottom:0px}#mw-panel.collapsible-nav div.collapsed h5{color:#0645AD;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRF3d3deXl5////nZ2dQA6SoAAAAAN0Uk5T//8A18oNQQAAADNJREFUeNpiYEIDDMQKMKALMDOgCTDCRWACcBG4AEwEIcDITEAFuhnotmC4g4EEzwEEGAADqgHmQSPJKgAAAABJRU5ErkJggg==) left center no-repeat;background:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/closed-ltr.png?2011-02-12T21:25:00Z) left center no-repeat!ie;margin-bottom:0px}#mw-panel.collapsible-nav div h5:hover{cursor:pointer;text-decoration:none}#mw-panel.collapsible-nav div.collapsed h5:hover{text-decoration:underline}#mw-panel.collapsible-nav div.portal div.body{background:none !important;padding-top:0px;display:none}#mw-panel.collapsible-nav div.persistent div.body{display:block}#mw-panel.collapsible-nav div.first h5{display:none}#mw-panel.collapsible-nav div.persistent h5{background:none !important;padding-left:0.7em;cursor:default}#mw-panel.collapsible-nav div.portal div.body ul li{padding:0.25em 0}#mw-panel.collapsible-nav div.first{background-image:none;margin-top:0px}#mw-panel.collapsible-nav div.persistent div.body{margin-left:0.5em}
-
-/* cache key: enwiki:resourceloader:filter:minify-css:3:c5cca4c308b0b64d12b1147b6871e86e */</style><meta name="ResourceLoaderDynamicStyles" content=""><link rel="stylesheet" href="ZIP_%28file_format%29_files/load.css" type="text/css" media="all">
-<style type="text/css" media="all">a.new,#quickbar a.new{color:#ba0000}
-
-/* cache key: enwiki:resourceloader:filter:minify-css:3:f2a9127573a22335c2a9102b208c73e7 */</style><link rel="stylesheet" href="ZIP_%28file_format%29_files/load_003.css" type="text/css" media="all">
-
-<!--[if lt IE 7]><style type="text/css">body{behavior:url("/w/skins-1.17/vector/csshover.min.htc")}</style><![endif]--><link href="ZIP_%28file_format%29_files/index.css" rel="stylesheet" type="text/css"></head><body class="mediawiki ltr ns-0 ns-subject page-ZIP_file_format skin-vector">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta name="generator" content="MediaWiki 1.17wmf1" />
+<link rel="alternate" type="application/x-wiki" title="Edit this page" href="http://en.wikipedia.org/w/index.php?title=ZIP_%28file_format%29&amp;action=edit" />
+<link rel="edit" title="Edit this page" href="http://en.wikipedia.org/w/index.php?title=ZIP_%28file_format%29&amp;action=edit" />
+<link rel="apple-touch-icon" href="http://en.wikipedia.org/apple-touch-icon.png" />
+<link rel="shortcut icon" href="http://en.wikipedia.org/favicon.ico" />
+<link rel="search" type="application/opensearchdescription+xml" href="http://en.wikipedia.org/w/opensearch_desc.php" title="Wikipedia (en)" />
+<link rel="EditURI" type="application/rsd+xml" href="http://en.wikipedia.org/w/api.php?action=rsd" />
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/" />
+<link rel="alternate" type="application/atom+xml" title="Wikipedia Atom feed" href="http://en.wikipedia.org/w/index.php?title=Special:RecentChanges&amp;feed=atom" />
+<link rel="stylesheet" href="ZIP_%28file_format%29_files/load_002.css" type="text/css" media="all" />
+<style type="text/css" media="all">
+	.suggestions{overflow:hidden;position:absolute;top:0px;left:0px;width:0px;border:none;z-index:99;padding:0;margin:-1px -1px 0 0} 
+	html > body .suggestions{margin:-1px 0 0 0}
+	.suggestions-special{position:relative;background-color:Window;font-size:0.8em;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}
+	.suggestions-results{background-color:white;background-color:Window;font-size:0.8em;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0}
+	.suggestions-result{color:black;color:WindowText;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left}
+	.suggestions-result-current{background-color:#4C59A6;background-color:Highlight;color:white;color:HighlightText}
+	.suggestions-special .special-label{font-size:0.8em;color:gray;text-align:left}
+	.suggestions-special .special-query{color:black;font-style:italic;text-align:left}
+	.suggestions-special .special-hover{background-color:silver}
+	.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:white;color:HighlightText}
+	.autoellipsis-matched,.highlight{font-weight:bold}
+	/* cache key: enwiki:resourceloader:filter:minify-css:3:8d395f27880b6ffcab73b1c74b0217ea */
+</style>
+<style type="text/css" media="all">
+	#mw-panel.collapsible-nav div.portal{
+		background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAAABCAMAAAA7MLYKAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEtQTFRF29vb2tra4ODg6urq5OTk4uLi6+vr7e3t7Ozs8PDw5+fn4+Pj4eHh3d3d39/f6Ojo5eXl6enp8fHx8/Pz8vLy7+/v3Nzc2dnZ2NjYnErj7QAAAD1JREFUeNq0wQUBACAMALDj7hf6JyUFGxzEnYhC9GaNPG1xVffGDErk/iCigLl1XV2xM49lfAxEaSM+AQYA9HMKuv4liFQAAAAASUVORK5CYII=);
+		background-image:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/portal-break.png?2011-02-12T21:25:00Z);
+		background-position:left top;
+		background-repeat:no-repeat;
+		padding:0.25em 0 !important;
+		margin:-11px 9px 10px 11px;
+	}
+	#mw-panel.collapsible-nav div.portal h5{
+		color:#4D4D4D;
+		font-weight:normal;
+		background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA9QTFRFeXl53d3dmpqasbGx////GU0iEgAAAAV0Uk5T/////wD7tg5TAAAAK0lEQVQI12NwgQIG0hhCDAwMTCJAhqMCA4MiWEoIJABiOCooQhULi5BqMgB2bh4svs8t+QAAAABJRU5ErkJggg==) left center no-repeat;
+		background:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/open.png?2011-02-12T21:25:00Z) left center no-repeat;
+		padding:4px 0 3px 1.5em;
+		margin-bottom:0px;
+	}
+	#mw-panel.collapsible-nav div.collapsed h5{
+		color:#0645AD;
+		background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAxQTFRF3d3deXl5////nZ2dQA6SoAAAAAN0Uk5T//8A18oNQQAAADNJREFUeNpiYEIDDMQKMKALMDOgCTDCRWACcBG4AEwEIcDITEAFuhnotmC4g4EEzwEEGAADqgHmQSPJKgAAAABJRU5ErkJggg==) left center no-repeat;
+		background:url(http://bits.wikimedia.org/w/extensions-1.17/Vector/modules/./images/closed-ltr.png?2011-02-12T21:25:00Z) left center no-repeat;
+		margin-bottom:0px;
+	}
+	#mw-panel.collapsible-nav div h5:hover{cursor:pointer;text-decoration:none}
+	#mw-panel.collapsible-nav div.collapsed h5:hover{text-decoration:underline}
+	#mw-panel.collapsible-nav div.portal div.body{background:none !important;padding-top:0px;display:none}
+	#mw-panel.collapsible-nav div.persistent div.body{display:block}
+	#mw-panel.collapsible-nav div.first h5{display:none}
+	#mw-panel.collapsible-nav div.persistent h5{background:none !important;padding-left:0.7em;cursor:default}
+	#mw-panel.collapsible-nav div.portal div.body ul li{padding:0.25em 0}
+	#mw-panel.collapsible-nav div.first{background-image:none;margin-top:0px}
+	#mw-panel.collapsible-nav div.persistent div.body{margin-left:0.5em}
+	/* cache key: enwiki:resourceloader:filter:minify-css:3:c5cca4c308b0b64d12b1147b6871e86e */
+</style>
+<meta name="ResourceLoaderDynamicStyles" content="" />
+<link rel="stylesheet" href="ZIP_%28file_format%29_files/load.css" type="text/css" media="all" />
+<style type="text/css" media="all">
+	a.new,#quickbar a.new{color:#ba0000}
+	/* cache key: enwiki:resourceloader:filter:minify-css:3:f2a9127573a22335c2a9102b208c73e7 */
+</style>
+<link rel="stylesheet" href="ZIP_%28file_format%29_files/load_003.css" type="text/css" media="all" />
+<!--[if lt IE 7]><style type="text/css">body{behavior:url("/w/skins-1.17/vector/csshover.min.htc")}</style><![endif]-->
+<link href="ZIP_%28file_format%29_files/index.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="mediawiki ltr ns-0 ns-subject page-ZIP_file_format skin-vector">
 		<div id="mw-page-base" class="noprint"></div>
 		<div id="mw-head-base" class="noprint"></div>
 		<!-- content -->
-		<div id="content"><div style="visibility: hidden; display: none; width: 602px; height: 402px; margin: 0px; padding: 0px; background-color: white; position: absolute; right: 2em; top: 1em; border: 1px solid gray; z-index: 13;"><iframe style="z-index: 14; position: absolute; right: 1px; top: 1px; width: 600px; height: 400px; margin: 0px; padding: 0px;" scrolling="no" frameborder="0"></iframe><img style="z-index: 15; position: absolute; right: 11px; top: 9px; width: 18px; cursor: pointer;" src="ZIP_%28file_format%29_files/Button_hide.png" title="close"></div>
+		<div id="content"><div style="visibility: hidden; display: none; width: 602px; height: 402px; margin: 0px; padding: 0px; background-color: white; position: absolute; right: 2em; top: 1em; border: 1px solid gray; z-index: 13;"><iframe style="z-index: 14; position: absolute; right: 1px; top: 1px; width: 600px; height: 400px; margin: 0px; padding: 0px;" scrolling="no" frameborder="0"></iframe><img style="z-index: 15; position: absolute; right: 11px; top: 9px; width: 18px; cursor: pointer;" src="ZIP_%28file_format%29_files/Button_hide.png" title="close"/></div>
 			<a id="top"></a>
 			<div id="mw-js-message" style="display: none;"></div>
 						<!-- sitenotice -->
@@ -62,7 +110,7 @@ document.writeln("\x3cdiv id=\"localNotice\"\x3e\x3cp\x3e\x3c/p\x3e\n\x3c/div\x3
 <table class="metadata plainlinks ambox ambox-style" style="">
 <tbody><tr>
 <td class="mbox-image">
-<div style="width: 52px;"><img alt="" src="ZIP_%28file_format%29_files/40px-Edit-clear.png" height="40" width="40"></div>
+<div style="width: 52px;"><img alt="" src="ZIP_%28file_format%29_files/40px-Edit-clear.png" height="40" width="40"/></div>
 </td>
 <td class="mbox-text" style="">This article <b>may require <a href="http://en.wikipedia.org/wiki/Wikipedia:Cleanup" title="Wikipedia:Cleanup">cleanup</a> to meet Wikipedia's <a href="http://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style" title="Wikipedia:Manual of Style">quality standards</a>.</b> Please <a href="http://en.wikipedia.org/w/index.php?title=ZIP_%28file_format%29&amp;action=edit" class="external text" rel="nofollow">improve this article</a> if you can. The <a href="http://en.wikipedia.org/wiki/Talk:ZIP_%28file_format%29" title="Talk:ZIP (file format)">talk page</a> may contain suggestions. <small><i>(September 2010)</i></small></td>
 </tr>
@@ -71,7 +119,7 @@ document.writeln("\x3cdiv id=\"localNotice\"\x3e\x3cp\x3e\x3c/p\x3e\n\x3c/div\x3
 <caption class="" style="font-size: 125%; font-weight: bold;">ZIP</caption>
 <tbody><tr class="">
 <th scope="row" style="text-align: left;"><a href="http://en.wikipedia.org/wiki/Filename_extension">Filename extension</a></th>
-<td class="" style=""><code><tt>.zip</tt><br>
+<td class="" style=""><code><tt>.zip</tt><br />
 <tt>.zipx</tt> <small>(newer compression algorithms)</small></code></td>
 </tr>
 <tr class="">
@@ -96,9 +144,9 @@ document.writeln("\x3cdiv id=\"localNotice\"\x3e\x3cp\x3e\x3c/p\x3e\n\x3c/div\x3
 </tr>
 <tr class="">
 <th scope="row" style="text-align: left;">Extended to</th>
-<td class="" style=""><a href="http://en.wikipedia.org/wiki/JAR_%28file_format%29" title="JAR (file format)" class="mw-redirect">JAR</a> <small>(<a href="http://en.wikipedia.org/wiki/EAR_%28file_format%29" title="EAR (file format)">EAR</a>, <a href="http://en.wikipedia.org/wiki/Resource_Adapter" title="Resource Adapter">RAR (Java)</a>, <a href="http://en.wikipedia.org/wiki/WAR_%28Sun_file_format%29" title="WAR (Sun file format)" class="mw-redirect">WAR</a>)</small><br>
-<a href="http://en.wikipedia.org/wiki/Office_Open_XML">Office Open XML</a> (Microsoft)<br>
-<a href="http://en.wikipedia.org/wiki/OpenDocument">OpenDocument</a> (ODF)<br>
+<td class="" style=""><a href="http://en.wikipedia.org/wiki/JAR_%28file_format%29" title="JAR (file format)" class="mw-redirect">JAR</a> <small>(<a href="http://en.wikipedia.org/wiki/EAR_%28file_format%29" title="EAR (file format)">EAR</a>, <a href="http://en.wikipedia.org/wiki/Resource_Adapter" title="Resource Adapter">RAR (Java)</a>, <a href="http://en.wikipedia.org/wiki/WAR_%28Sun_file_format%29" title="WAR (Sun file format)" class="mw-redirect">WAR</a>)</small><br />
+<a href="http://en.wikipedia.org/wiki/Office_Open_XML">Office Open XML</a> (Microsoft)<br />
+<a href="http://en.wikipedia.org/wiki/OpenDocument">OpenDocument</a> (ODF)<br />
 <a href="http://en.wikipedia.org/wiki/XPI" class="mw-redirect" title="XPI">XPI</a> (Mozilla extensions)</td>
 </tr>
 <tr class="">
@@ -239,7 +287,7 @@ extensibility of the ZIP format. "Extra" fields are exploited to support
 and higher-resolution NTFS or Unix file timestamps. Other extensions are
  possible via the "Extra" field. ZIP tools are required by the 
 specification to ignore Extra fields they do not recognize.</p>
-<p><a href="http://en.wikipedia.org/wiki/File:ZIPformat.jpg" class="image"><img alt="ZIPformat.jpg" src="ZIP_%28file_format%29_files/ZIPformat.jpg" height="282" width="624"></a></p>
+<p><a href="http://en.wikipedia.org/wiki/File:ZIPformat.jpg" class="image"><img alt="ZIPformat.jpg" src="ZIP_%28file_format%29_files/ZIPformat.jpg" height="282" width="624"/></a></p>
 <p>The ZIP format uses specific 4-byte "signatures" to denote the 
 various structures in the file. Each file entry is marked by a specific 
 signature. The beginning of the central directory is indicated with a 
@@ -810,7 +858,7 @@ Retrieved from "<a href="http://en.wikipedia.org/wiki/ZIP_%28file_format%29">htt
 <div id="p-variants" class="vectorMenu emptyPortlet">
 		<h5><span>Variants</span><a href="#"></a></h5>
 	<div class="menu">
-		<ul>
+		<ul><li></li>
 					</ul>
 	</div>
 </div>
@@ -836,7 +884,7 @@ Please use the preview button before saving. [alt-shift-e]" accesskey="e">Edit</
 <div id="p-cactions" class="vectorMenu emptyPortlet">
 	<h5><span>Actions</span><a href="#"></a></h5>
 	<div class="menu">
-		<ul>
+		<ul><li></li>
 					</ul>
 	</div>
 </div>
@@ -847,10 +895,10 @@ Please use the preview button before saving. [alt-shift-e]" accesskey="e">Edit</
 <div id="p-search">
 	<h5><label for="searchInput">Search</label></h5>
 	<form action="/w/index.php" id="searchform">
-		<input name="title" value="Special:Search" type="hidden">
+		<input name="title" value="Special:Search" type="hidden"/>
 				<div id="simpleSearch">
-						<input autocomplete="off" class="placeholder" placeholder="Search" tabindex="1" id="searchInput" name="search" title="Search Wikipedia [alt-shift-f]" accesskey="f" value="Search" type="text">
-						<button id="searchButton" type="submit" name="button" title="Search Wikipedia for this text"><img src="ZIP_%28file_format%29_files/search-ltr.png" alt="Search"></button>
+						<input autocomplete="off" class="placeholder" placeholder="Search" tabindex="1" id="searchInput" name="search" title="Search Wikipedia [alt-shift-f]" accesskey="f" value="Search" type="text"/>
+						<button id="searchButton" type="submit" name="button" title="Search Wikipedia for this text"><img src="ZIP_%28file_format%29_files/search-ltr.png" alt="Search"/></button>
 					</div>
 			</form>
 </div>
@@ -971,11 +1019,11 @@ Please use the preview button before saving. [alt-shift-e]" accesskey="e">Edit</
 		<!-- footer -->
 		<div id="footer">
 											<ul id="footer-info">
-																	<li id="footer-info-lastmod"> This page was last modified on 17 February 2011 at 15:54.<br></li>
+																	<li id="footer-info-lastmod"> This page was last modified on 17 February 2011 at 15:54.<br /></li>
 																							<li id="footer-info-copyright">Text is available under the <a rel="license" href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License">Creative Commons Attribution-ShareAlike License</a><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/" style="display: none;"></a>;
 additional terms may apply.
-See <a href="http://wikimediafoundation.org/wiki/Terms_of_Use">Terms of Use</a> for details.<br>
-Wikipedia® is a registered trademark of the <a href="http://www.wikimediafoundation.org/">Wikimedia Foundation, Inc.</a>, a non-profit organization.<br></li><li class="noprint"><a class="internal" href="http://en.wikipedia.org/wiki/Wikipedia:Contact_us">Contact us</a></li>
+See <a href="http://wikimediafoundation.org/wiki/Terms_of_Use">Terms of Use</a> for details.<br />
+Wikipedia® is a registered trademark of the <a href="http://www.wikimediafoundation.org/">Wikimedia Foundation, Inc.</a>, a non-profit organization.<br /></li><li class="noprint"><a class="internal" href="http://en.wikipedia.org/wiki/Wikipedia:Contact_us">Contact us</a></li>
 															</ul>
 															<ul id="footer-places">
 																	<li id="footer-places-privacy"><a href="http://wikimediafoundation.org/wiki/Privacy_policy" title="wikimedia:Privacy policy">Privacy policy</a></li>

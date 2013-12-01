@@ -15,11 +15,11 @@ $zip->addFile("Hello World!", "hello.txt");
 if ($handle) {
     /* This is the correct way to loop over the directory. */
     while (false !== ($file = readdir($handle))) {
-        if (strpos($file, ".html") !== false) {
+        if (strpos($file, ".php") !== false) {
             $pathData = pathinfo($fileDir . $file);
             $fileName = $pathData['filename'];
 
-            $zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file));
+            $zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file), Zip::getFileExtAttr($file));
         }
     }
 }

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------
+Rev. 1.50 - 2013-12-01
+* Added: Support for defining file permissions, using the unix format, ie. 644 for files and 755 for dirs
+* Changed: The default permission on files and dirs from 777 to 644 and 755 respectively.
+* Changed: addDicextoryContent now reads permissions from the filesystem, but the user can override.
+---------------------------------------------------------------------
 Rev. 1.40 - 2013-09-16
 * Fixed: Trailing semicolon in the Content-Disposition file header caused trouble in some browsers
 ---------------------------------------------------------------------
