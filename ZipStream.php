@@ -13,14 +13,14 @@
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
  * @author A. Grandt <php@grandt.com>
- * @copyright 2009-2013 A. Grandt
+ * @copyright 2009-2014 A. Grandt
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.50
+ * @version 1.60
  */
 class ZipStream {
-    const VERSION = 1.50;
+    const VERSION = 1.60;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
