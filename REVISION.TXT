@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------
-Rev. 1.60 - 2014-01-01
-* 
+Rev. 1.60 - 2014-01-11
+* Fixed: File attribures parameter added in 1.50 ($extFileAttr) were not used in Zip->addFile.
+* Added: The ability to send the zip with a UTF-8 encoded filename, and the ability to choose to send the file as "inline"
+- Note, thanks to Mikael Ylikoski for these corrections and additions.
 ---------------------------------------------------------------------
 Rev. 1.50 - 2013-12-01
 * Added: Support for defining file permissions, using the unix format, ie. 644 for files and 755 for dirs
