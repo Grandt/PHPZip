@@ -29,5 +29,7 @@ if ($handle) {
 $zip->addDirectoryContent("testData/test", "recursiveDir/test");
 $zip->addDirectoryContent("testData/test", "recursiveDir/testFlat", FALSE);
 
-$zip->sendZip("ZipExample1.zip");
+//$zip->sendZip("ZipExample1.zip");
+//$zip->sendZip("ZipExample1_€2,000.zip");
+$zip->sendZip("ZipExample1_€2,000.zip", "application/zip", "ZipExample1_€2,000_utf8.zip");
 ?>

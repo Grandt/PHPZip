@@ -13,14 +13,14 @@
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
  * @author A. Grandt <php@grandt.com>
- * @copyright 2009-2013 A. Grandt
+ * @copyright 2009-2014 A. Grandt
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.50
+ * @version 1.60
  */
 class ZipStream {
-    const VERSION = 1.50;
+    const VERSION = 1.60;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -93,10 +93,12 @@ class ZipStream {
     /**
      * Constructor.
      *
-     * @param string $archiveName Name to send to the HTTP client.
-     * @param string $contentType Content mime type. Optional, defaults to "application/zip".
+     * @param String $fileName The name of the Zip archive, in ISO-8859-1 (or ASCII) encoding, ie. "archive.zip". Optional, defaults to NULL, which means that no ISO-8859-1 encoded file name will be specified.
+     * @param String $contentType Content mime type. Optional, defaults to "application/zip".
+     * @param String $utf8FileName The name of the Zip archive, in UTF-8 encoding. Optional, defaults to NULL, which means that no UTF-8 encoded file name will be specified.
+     * @param bool $inline Use Content-Disposition with "inline" instead of "attached". Optional, defaults to FALSE.
      */
-    function __construct($archiveName = "", $contentType = "application/zip") {
+    function __construct($archiveName = "", $contentType = "application/zip", $utf8FileName = null, $inline = false) {
         if (!function_exists('sys_get_temp_dir')) {
             die ("ERROR: ZipStream " . self::VERSION . " requires PHP version 5.2.1 or above.");
         }
@@ -115,9 +117,20 @@ class ZipStream {
                 header("Accept-Ranges: bytes");
                 //header("Connection: Keep-Alive");
                 header("Content-Type: " . $contentType);
-                header('Content-Disposition: attachment; filename="' . $archiveName . '"');
-                header("Content-Transfer-Encoding: binary");
-                flush();
+                $cd = "Content-Disposition: ";
+                if ($inline) {
+                    $cd .= "inline";
+				} else{
+                    $cd .= "attached";
+				}
+                if ($fileName) {
+                    $cd .= '; filename="' . $fileName . '"';
+				}
+                if ($utf8FileName) {
+                    $cd .= "; filename*=UTF-8''" . rawurlencode($utf8FileName);
+				}
+                header($cd);
+				flush();
             }
         }
     }
