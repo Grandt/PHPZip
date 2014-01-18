@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------
+Rev. 1.61 - 2014-01-18
+* Added: UTF-8 path and comment extra fields, if the file name and/or comment is a UTF-8 string.
+- Note: Not all Zip implementations can handle UTF-8, even with these fields added. Windows Explorer's build in tool seems to be one.
+---------------------------------------------------------------------
 Rev. 1.60 - 2014-01-11
 * Fixed: File attribures parameter added in 1.50 ($extFileAttr) were not used in Zip->addFile.
 * Added: The ability to send the zip with a UTF-8 encoded filename, and the ability to choose to send the file as "inline"
