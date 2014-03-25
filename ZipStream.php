@@ -92,6 +92,10 @@ class ZipStream {
     private $streamData = null;
     private $streamFileLength = 0;
 	private $streamExtFileAttr = null;
+	/** A custom temporary folder, or a callable that returns a custom temporary file.
+	 * @var string|callable
+	 */
+	public static $temp = null;
 
     /**
      * Constructor.
@@ -356,7 +360,7 @@ class ZipStream {
             $this->closeStream();
         }
 
-        $this->streamFile = tempnam(sys_get_temp_dir(), 'ZipStream');
+        $this->streamFile = self::getTemporaryFile();
         $this->streamData = fopen($this->streamFile, "wb");
         $this->streamFilePath = $filePath;
         $this->streamTimestamp = $timestamp;
@@ -422,7 +426,7 @@ class ZipStream {
             return FALSE;
         }
 
-        $tempzip = tempnam(sys_get_temp_dir(), 'ZipStream');
+        $tempzip = self::getTemporaryFile();
 
         $zip = new ZipArchive;
         if ($zip->open($tempzip) === TRUE) {
@@ -708,5 +712,18 @@ class ZipStream {
 		}
 		return FALSE;
 	}
+	/**
+	 * Returns the path to a temporary file.
+	 * @return string
+	 */
+	private static function getTemporaryFile() {
+		if(is_callable(self::$temp)) {
+			$temporaryFile = @call_user_func(self::$temp);
+			if(is_string($temporaryFile) && strlen($temporaryFile)) {
+				return $temporaryFile;
+			}
+		}
+		$temporaryDirectory = (is_string(self::$temp) && strlen(self::$temp)) ? self::$temp : sys_get_temp_dir();
+		return tempnam($temporaryDirectory, 'ZipStream');
+	}
 }
-?>
