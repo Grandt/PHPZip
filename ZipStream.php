@@ -6,7 +6,7 @@
  * If you need the Zip file data on the server, for storage in a database of the server file system, look at
  *  the Zip class at http://www.phpclasses.org/browse/package/6110.html
  *
- * License: GNU LGPL, Attribution required for commercial implementations, requested for everything else.
+ * License: GNU LGPL 2.1.
  *
  * Initially inspired by CreateZipFile by Rochak Chauhan  www.rochakchauhan.com (http://www.phpclasses.org/browse/package/2322.html)
  * and
@@ -17,10 +17,10 @@
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6116
  * @link https://github.com/Grandt/PHPZip
- * @version 1.61
+ * @version 1.62
  */
 class ZipStream {
-    const VERSION = 1.61;
+    const VERSION = 1.62;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -719,7 +719,7 @@ class ZipStream {
 	private static function getTemporaryFile() {
 		if(is_callable(self::$temp)) {
 			$temporaryFile = @call_user_func(self::$temp);
-			if(is_string($temporaryFile) && strlen($temporaryFile)) {
+			if(is_string($temporaryFile) && strlen($temporaryFile) && is_writable($temporaryFile)) {
 				return $temporaryFile;
 			}
 		}

@@ -6,17 +6,17 @@
  * and
  * http://www.pkware.com/documents/casestudies/APPNOTE.TXT Zip file specification.
  *
- * License: GNU LGPL, Attribution required for commercial implementations, requested for everything else.
+ * License: GNU LGPL 2.1.
  *
  * @author A. Grandt <php@grandt.com>
  * @copyright 2009-2014 A. Grandt
  * @license GNU LGPL 2.1
  * @link http://www.phpclasses.org/package/6110
  * @link https://github.com/Grandt/PHPZip
- * @version 1.61
+ * @version 1.62
  */
 class Zip {
-    const VERSION = 1.61;
+    const VERSION = 1.62;
 
     const ZIP_LOCAL_FILE_HEADER = "\x50\x4b\x03\x04"; // Local file header signature
     const ZIP_CENTRAL_FILE_HEADER = "\x50\x4b\x01\x02"; // Central file header signature
@@ -389,11 +389,11 @@ class Zip {
 
         $length = fwrite($this->streamData, $data, strlen($data));
         if ($length != strlen($data)) {
-            die ("<p>Length mismatch</p>\n");
-        }
-        $this->streamFileLength += $length;
-
-        return $length;
+			die ("<p>File IO: Error writing; Length mismatch: Expected " . strlen($data) . " bytes, wrote " . ($length === FALSE ? "NONE!" : $length) . "</p>\n");
+		}
+		$this->streamFileLength += $length;
+        
+		return $length;
     }
 
     /**
@@ -850,7 +850,7 @@ class Zip {
 	private static function getTemporaryFile() {
 		if(is_callable(self::$temp)) {
 			$temporaryFile = @call_user_func(self::$temp);
-			if(is_string($temporaryFile) && strlen($temporaryFile)) {
+			if(is_string($temporaryFile) && strlen($temporaryFile) && is_writable($temporaryFile)) {
 				return $temporaryFile;
 			}
 		}

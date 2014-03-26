@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------
+Rev. 1.62 - 2014-03-25
+* Added: Support for the user to set their own temp file.
+- From Michelle Locati, the submitter of this patch:
+  "Let's allow users to customize temporary files, either by setting Zip::$temp to a custom temporary folder or by setting Zip::$temp to a callable that returns a custom temporary file name."
+---------------------------------------------------------------------
 Rev. 1.61 - 2014-01-18
 * Added: UTF-8 path and comment extra fields, if the file name and/or comment is a UTF-8 string.
 - Note: Not all Zip implementations can handle UTF-8, even with these fields added. Windows Explorer's build in tool seems to be one.
