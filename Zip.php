@@ -347,12 +347,13 @@ class Zip {
      * @param string $filePath    Filepath and name to be used in the archive.
      * @param int    $timestamp   (Optional) Timestamp for the added file, if omitted or set to 0, the current time will be used.
      * @param string $fileComment (Optional) Comment to be added to the archive for this file. To use fileComment, timestamp must be given.
-	 * @param int    $extFileAttr (Optional) The external file reference, use generateExtAttr to generate this.
+     * @param int    $extFileAttr (Optional) The external file reference, use generateExtAttr to generate this.
+     * @throws Exception Throws an exception in case of errors
      * @return bool $success
      */
     public function openStream($filePath, $timestamp = 0, $fileComment = null, $extFileAttr = self::EXT_FILE_ATTR_FILE)   {
         if (!function_exists('sys_get_temp_dir')) {
-            die ("ERROR: Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
+            throw new Exception("Zip " . self::VERSION . " requires PHP version 5.2.1 or above if large files are used.");
         }
 
         if ($this->isFinalized) {
@@ -380,6 +381,7 @@ class Zip {
      * Add data to the open stream.
      *
      * @param string $data
+     * @throws Exception Throws an exception in case of errors
      * @return mixed length in bytes added or FALSE if the archive is finalized or there are no open stream.
      */
     public function addStreamData($data) {
@@ -389,7 +391,7 @@ class Zip {
 
         $length = fwrite($this->streamData, $data, strlen($data));
         if ($length != strlen($data)) {
-			die ("<p>File IO: Error writing; Length mismatch: Expected " . strlen($data) . " bytes, wrote " . ($length === FALSE ? "NONE!" : $length) . "</p>\n");
+			throw new Exception("File IO: Error writing; Length mismatch: Expected " . strlen($data) . " bytes, wrote " . ($length === FALSE ? "NONE!" : $length));
 		}
 		$this->streamFileLength += $length;
         
@@ -545,63 +547,61 @@ class Zip {
         }
     }
 
-    /**
-     * Send the archive as a zip download
-     *
-     * @param String $fileName The name of the Zip archive, in ISO-8859-1 (or ASCII) encoding, ie. "archive.zip". Optional, defaults to NULL, which means that no ISO-8859-1 encoded file name will be specified.
-     * @param String $contentType Content mime type. Optional, defaults to "application/zip".
-     * @param String $utf8FileName The name of the Zip archive, in UTF-8 encoding. Optional, defaults to NULL, which means that no UTF-8 encoded file name will be specified.
-     * @param bool $inline Use Content-Disposition with "inline" instead of "attached". Optional, defaults to FALSE.
-     * @return bool $success
-     */
-    function sendZip($fileName = null, $contentType = "application/zip", $utf8FileName = null, $inline = false) {
-        if (!$this->isFinalized) {
-            $this->finalize();
-        }
-
-        $headerFile = null;
-        $headerLine = null;
-        if (!headers_sent($headerFile, $headerLine) or die("<p><strong>Error:</strong> Unable to send file $fileName. HTML Headers have already been sent from <strong>$headerFile</strong> in line <strong>$headerLine</strong></p>")) {
-            if ((ob_get_contents() === FALSE || ob_get_contents() == '') or die("\n<p><strong>Error:</strong> Unable to send file <strong>$fileName</strong>. Output buffer contains the following text (typically warnings or errors):<br>" . htmlentities(ob_get_contents()) . "</p>")) {
-                if (ini_get('zlib.output_compression')) {
-                    ini_set('zlib.output_compression', 'Off');
-                }
-
-                header("Pragma: public");
-                header("Last-Modified: " . gmdate("D, d M Y H:i:s T"));
-                header("Expires: 0");
-                header("Accept-Ranges: bytes");
-                header("Connection: close");
-                header("Content-Type: " . $contentType);
-                $cd = "Content-Disposition: ";
-                if ($inline) {
-                    $cd .= "inline";
-				} else{
-                    $cd .= "attached";
-				}
-                if ($fileName) {
-                    $cd .= '; filename="' . $fileName . '"';
-				}
-                if ($utf8FileName) {
-                    $cd .= "; filename*=UTF-8''" . rawurlencode($utf8FileName);
-				}
-                header($cd);
-                header("Content-Length: ". $this->getArchiveSize());
-
-                if (!is_resource($this->zipFile)) {
-                    echo $this->zipData;
-                } else {
-                    rewind($this->zipFile);
-
-                    while (!feof($this->zipFile)) {
-                        echo fread($this->zipFile, $this->streamChunkSize);
-                    }
-                }
-            }
-            return TRUE;
-        }
-        return FALSE;
-    }
+	/**
+	 * Send the archive as a zip download
+	 *
+	 * @param String $fileName The name of the Zip archive, in ISO-8859-1 (or ASCII) encoding, ie. "archive.zip". Optional, defaults to NULL, which means that no ISO-8859-1 encoded file name will be specified.
+	 * @param String $contentType Content mime type. Optional, defaults to "application/zip".
+	 * @param String $utf8FileName The name of the Zip archive, in UTF-8 encoding. Optional, defaults to NULL, which means that no UTF-8 encoded file name will be specified.
+	 * @param bool $inline Use Content-Disposition with "inline" instead of "attached". Optional, defaults to FALSE.
+	 * @throws Exception Throws an exception in case of errors
+	 * @return bool Always returns true (for backward compatibility).
+	*/
+	function sendZip($fileName = null, $contentType = "application/zip", $utf8FileName = null, $inline = false) {
+		if (!$this->isFinalized) {
+			$this->finalize();
+		}
+		$headerFile = null;
+		$headerLine = null;
+		if(headers_sent($headerFile, $headerLine)) {
+        	throw new Exception("Unable to send file '$fileName'. Headers have already been sent from '$headerFile' in line $headerLine");
+		}
+		if(ob_get_contents() !== false && strlen(ob_get_contents())) {
+			throw new Exception("Unable to send file '$fileName'. Output buffer contains the following text (typically warnings or errors):\n" . ob_get_contents());
+		}
+		if(@ini_get('zlib.output_compression')) {
+			@ini_set('zlib.output_compression', 'Off');
+		}
+		header("Pragma: public");
+		header("Last-Modified: " . @gmdate("D, d M Y H:i:s T"));
+		header("Expires: 0");
+		header("Accept-Ranges: bytes");
+		header("Connection: close");
+		header("Content-Type: " . $contentType);
+		$cd = "Content-Disposition: ";
+		if ($inline) {
+			$cd .= "inline";
+		} else {
+			$cd .= "attached";
+		}
+		if ($fileName) {
+			$cd .= '; filename="' . $fileName . '"';
+		}
+		if ($utf8FileName) {
+			$cd .= "; filename*=UTF-8''" . rawurlencode($utf8FileName);
+		}
+		header($cd);
+		header("Content-Length: ". $this->getArchiveSize());
+		if (!is_resource($this->zipFile)) {
+			echo $this->zipData;
+		} else {
+			rewind($this->zipFile);
+			while (!feof($this->zipFile)) {
+				echo fread($this->zipFile, $this->streamChunkSize);
+			}
+		}
+		return true;
+	}
 
     /**
      * Return the current size of the archive
