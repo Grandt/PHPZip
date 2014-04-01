@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------
 Rev. 1.62 - 2014-03-25
 * Added: Support for the user to set their own temp file.
-- From Michelle Locati, the submitter of this patch:
+- From Michele Locati, the submitter of this patch:
   "Let's allow users to customize temporary files, either by setting Zip::$temp to a custom temporary folder or by setting Zip::$temp to a callable that returns a custom temporary file name."
 ---------------------------------------------------------------------
 Rev. 1.61 - 2014-01-18
