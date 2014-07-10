@@ -1,0 +1,14 @@
+{
+    "require": {
+        "php": ">=5.3.0",
+        "phpunit/phpunit": "4.1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit-selenium": ">=1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPZip\\Zip\\": "../src/Zip"
+        }
+    }
+}

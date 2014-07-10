@@ -54,7 +54,7 @@ if(file_exists('./LipsumGenerator.php')) {
 }
 $zip->sendZip("ZipExample3.zip", "application/zip", "ZipExample3.zip");
 
-// If non-fatal errors occured during execution, this will append them 
+// If non-fatal errors occurred during execution, this will append them
 //  to the end of the generated file. 
 // It'll create an invalid Zip file, however chances are that it is invalid
 //  already due to the error happening in the first place.
