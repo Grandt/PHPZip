@@ -6,6 +6,10 @@
 .jsdtscope
 org.eclipse.*
 
+# PHPStorm files #
+#################
+.idea/*
+
 # Compiled source #
 ###################
 *.com
@@ -41,3 +45,8 @@ ehthumbs.db
 Icon?
 Thumbs.db
 /testData
+
+# Test generated files #
+#####################################
+tests/screenshots/*
+tests/vendor/*

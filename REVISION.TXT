@@ -1,3 +1,11 @@
+Rev. 2.0.0 - 2014-07-11
+* Added: Namespace support.
+* Added: custom Exceptions.
+* Added: composer and packagist support. This is ready to be uploaded as a package at packagist. Then it can be required by any composer project as a fully self-contained library.
+* Added: events (observer pattern). These may come in handy for automated operations.
+* Updated: Code structure to better suit psr standard. Also took a more scalable OO approach.
+
+* See issues #19 and #26 for more information.
 ---------------------------------------------------------------------
 Rev. 1.62 - 2014-03-25
 * Added: Support for the user to set their own temp file.

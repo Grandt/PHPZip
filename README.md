@@ -8,10 +8,10 @@ ZipStream: http://www.phpclasses.org/package/6616
 WARNING: THE CURRENT VERSION OF PHPZip *WILL* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
 *****************************************************************************************************************
 
-Zip.php generates the Zip file in memory (or tempfile) allowing the parent script to save the final Zip file elsewhere, and/or send it to the user.
+Zip.php generates the Zip file in memory (or temp file) allowing the parent script to save the final Zip file elsewhere, and/or send it to the user.
 ZipStream has much of the same features and functions of Zip.php, with a few notable differences, it does not cache and build the zip file on the server, instead it'll send the file to the user as a stream.
 
-See the examples for example usage. The php files have "some" doumentation in them in the form of Javadoc style function headers.
+See the examples for example usage. The php files have "some" documentation in them in the form of Javadoc style function headers.
 
 NOTE: Please ensure that output buffering is disabled when using especially ZipStream. It defeats the purpose of the class, and large zip files may cause a memory exceeded exception.
 NOTE2: THe Zip and ZipStream classes support UTF-8 in file paths and file comments, and will autodetect UTF-8 strings to that end, however it is up to the user to ensure that other Multibyte chracter sets aren't sent to the class.
