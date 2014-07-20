@@ -25,7 +25,6 @@ class IncompatiblePhpVersion extends \PHPZip\Zip\Core\AbstractException {
 	 * @param array $config Configuration array containing appName, appVersion and minVersion (PHP)
 	 */
 	public function __construct(array $config){
-
 		$this->_minVersion = (string)$config['minVersion'];
 		$this->_currentVersion = (string)phpversion();
 
@@ -41,19 +40,13 @@ class IncompatiblePhpVersion extends \PHPZip\Zip\Core\AbstractException {
 		);
 
 		parent::__construct($message);
-
 	}
 
 	public function getMinVersion(){
-
 		return $this->_minVersion;
-
 	}
 
 	public function getCurrentVersion(){
-
 		return $this->_currentVersion;
-
 	}
-
 }

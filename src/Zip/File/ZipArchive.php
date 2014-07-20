@@ -29,19 +29,13 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @throws \PHPZip\Zip\Exception\InvalidPhpConfiguration In case of errors
 	 */
 	public function __construct($useZipFile = false){
-
 		parent::__construct(self::STREAM_CHUNK_SIZE);
 
 		if ($useZipFile) {
-
 			$this->_zipFile = tmpfile();
-
 		} else {
-
 			$this->_zipData = '';
-
 		}
-
 	}
 
 	/**
@@ -51,12 +45,11 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @author A. Grandt <php@grandt.com>
 	 */
 	public function __destruct(){
-
-		if (is_resource($this->_zipFile))
+		if (is_resource($this->_zipFile)) {
 			fclose($this->_zipFile);
+		}
 
 		$this->_zipData = null;
-
 	}
 
 	/**
@@ -72,32 +65,27 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @return bool Success
 	 */
 	public function setZipFile($fileName) {
-
-		if (is_file($fileName))
+		if (is_file($fileName)) {
 			unlink($fileName);
+		}
 
 		$fd = fopen($fileName, "x+b");
 
 		if (is_resource($this->_zipFile)) {
-
 			rewind($this->_zipFile);
 
-			while (!feof($this->_zipFile))
+			while (!feof($this->_zipFile)) {
 				fwrite($fd, fread($this->_zipFile, $this->streamChunkSize));
+			}
 
 			fclose($this->_zipFile);
-
 		} else {
-
 			fwrite($fd, $this->_zipData);
 			$this->_zipData = null;
-
 		}
 
 		$this->_zipFile = $fd;
-
 		return true;
-
 	}
 
 	/**
@@ -109,19 +97,40 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @return resource zip file handle
 	 */
 	public function getZipFile() {
-
-		if (!$this->isFinalized)
+		if (!$this->isFinalized) {
 			$this->finalize();
+		}
 
-		$this->_zipFlush();
-
+		$this->zipFlush();
 		rewind($this->_zipFile);
-
 		return $this->_zipFile;
-
 	}
 
-	/**
+    /**
+     * Send the archive as a zip download
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param String $fileName      The name of the Zip archive, in ISO-8859-1 (or ASCII) encoding,
+     *                              ie. "archive.zip". Optional, defaults to null, which means that
+     *                              no ISO-8859-1 encoded file name will be specified.
+     * @param String $contentType   Content mime type. Optional, defaults to "application/zip".
+     * @param String $utf8FileName  The name of the Zip archive, in UTF-8 encoding. Optional, defaults
+     *                              to null, which means that no UTF-8 encoded file name will be specified.
+     * @param bool $inline          Use Content-Disposition with "inline" instead of "attached". Optional, defaults to false.
+     *
+     * @return bool $success
+     */
+    public function sendZip($fileName = null, $contentType = self::CONTENT_TYPE, $utf8FileName = null, $inline = false) {
+        if ($this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline)) {
+            header('Content-Length: ' . $this->getArchiveSize());
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
 	 * Get the zip file contents
 	 * If the zip haven't been finalized yet, this will cause it to become finalized
 	 *
@@ -131,26 +140,21 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @return string zip data
 	 */
 	public function getZipData() {
-
 		$result = null;
 
-		if (!$this->isFinalized)
+		if (!$this->isFinalized) {
 			$this->finalize();
+		}
 
 		if (!is_resource($this->_zipFile)) {
-
 			$result = $this->_zipData;
-
 		} else {
-
 			rewind($this->_zipFile);
 			$stat = fstat($this->_zipFile);
 			$result = fread($this->_zipFile, $stat['size']);
-
 		}
 
 		return $result;
-
 	}
 
 	/**
@@ -161,102 +165,12 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @return int Size of the archive
 	 */
 	public function getArchiveSize() {
-
-		if (!is_resource($this->_zipFile))
-			return strlen($this->_zipData);
+		if (!is_resource($this->_zipFile)) {
+			return parent::bin_strlen($this->_zipData);
+		}
 
 		$stat = fstat($this->_zipFile);
-
 		return $stat['size'];
-
-	}
-
-	/*
-	 * ************************************************************************
-	 * Private methods.
-	 * ************************************************************************
-	 */
-
-	/**
-	 * Write data to file.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param string $data Data to be written
-	 */
-	private function _zipWrite($data) {
-
-		if (!is_resource($this->_zipFile)) {
-
-			$this->_zipData .= $data;
-
-		} else {
-
-			fwrite($this->_zipFile, $data);
-			fflush($this->_zipFile);
-
-		}
-
-	}
-
-	/**
-	 * Flush the data to file, and reset the data.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 */
-	private function _zipFlush() {
-
-		if (!is_resource($this->_zipFile)) {
-
-			$this->_zipFile = tmpfile();
-			fwrite($this->_zipFile, $this->_zipData);
-			$this->_zipData = null;
-
-		}
-
-	}
-
-	/**
-	 * Close the archive.
-	 * A closed archive can no longer have new files added to it.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @return bool Success
-	 */
-	public function finalize() {
-
-		if (!$this->isFinalized) {
-
-			if (strlen($this->streamFilePath) > 0)
-				$this->closeStream();
-
-			$cd = implode("", $this->cdRec);
-
-			$cdRecSize = pack("v", sizeof($this->cdRec));
-			$cdRec = $cd . self::ZIP_END_OF_CENTRAL_DIRECTORY
-				. $cdRecSize . $cdRecSize
-				. pack("VV", strlen($cd), $this->offset);
-
-			if (!empty($this->zipComment)) {
-				$cdRec .= pack("v", strlen($this->zipComment)) . $this->zipComment;
-			} else {
-				$cdRec .= "\x00\x00";
-			}
-
-			$this->_zipWrite($cdRec);
-
-			$this->isFinalized = true;
-			$this->cdRec = null;
-
-			return true;
-
-		}
-
-		return false;
 	}
 
 	/*
@@ -275,9 +189,7 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains zipEntry.
 	 */
 	public function onBuildZipEntry(array $params){
-
-		$this->_zipWrite($params['zipEntry']);
-
+		$this->zipWrite($params['zipEntry']);
 	}
 
 	/**
@@ -290,10 +202,9 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains gzLength.
 	 */
 	public function onBeginAddFile(array $params){
-
-		if (!is_resource($this->_zipFile) && ($this->offset + $params['gzLength']) > self::MEMORY_THRESHOLD)
-			$this->_zipFlush();
-
+		if (!is_resource($this->_zipFile) && ($this->offset + $params['gzLength']) > self::MEMORY_THRESHOLD) {
+			$this->zipFlush();
+		}
 	}
 
 	/**
@@ -306,50 +217,42 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains gzData.
 	 */
 	public function onEndAddFile(array $params){
-
-		$this->_zipWrite($params['gzData']);
-
+		$this->zipWrite($params['gzData']);
 	}
 
 	/**
 	 * Called by superclass when specialised action is needed
-	 * at the start of sending a zip file.
+	 * at the start of sending the zip file response header.
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 * @author Greg Kappatos
 	 */
-	public function onBeginSendZip(){
-
-		if (!$this->isFinalized)
+	public function onBeginBuildResponseHeader(){
+		if (!$this->isFinalized) {
 			$this->finalize();
-
+		}
 	}
 
 	/**
 	 * Called by superclass when specialised action is needed
-	 * at the end of sending a zip file.
+	 * at the end of sending the zip file response header.
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 * @author Greg Kappatos
 	 */
-	public function onEndSendZip(){
-
+	public function onEndBuildResponseHeader(){
 		header('Connection: close');
 		header('Content-Length: ' . $this->getArchiveSize());
 
 		if (!is_resource($this->_zipFile)) {
-
 			echo $this->_zipData;
-
 		} else {
-
 			rewind($this->_zipFile);
 
-			while (!feof($this->_zipFile))
+			while (!feof($this->_zipFile)) {
 				echo fread($this->_zipFile, $this->streamChunkSize);
-
+			}
 		}
-
 	}
 
 	/**
@@ -360,9 +263,7 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @author Greg Kappatos
 	 */
 	public function onOpenStream(){
-
-		$this->_zipFlush();
-
+		$this->zipFlush();
 	}
 
 	/**
@@ -375,9 +276,57 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains data.
 	 */
 	public function onProcessFile(array $params){
-
-		$this->_zipWrite($params['data']);
-
+		$this->zipWrite($params['data']);
 	}
 
+    /**
+     * Verify if the memory buffer is about to be exceeded.
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param int $gzLength length of the pending data.
+     */
+    public function zipVerifyMemBuffer($gzLength) {
+        if (!is_resource($this->zipFile) && ($this->offset + $gzLength) > $this->zipMemoryThreshold) {
+            $this->zipFlush();
+        }
+    }
+
+    /**
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param string $data
+     */
+    public function zipWrite($data) {
+        if (!is_resource($this->zipFile)) {
+            $this->zipData .= $data;
+        } else {
+            fwrite($this->zipFile, $data);
+            fflush($this->zipFile);
+        }
+    }
+
+    /**
+     * Flush Zip Data stored in memory, to a temp file.
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     */
+    public function zipFlush() {
+        if (!is_resource($this->zipFile)) {
+            $this->zipFile = tmpfile();
+            fwrite($this->zipFile, $this->zipData);
+            $this->zipData = null;
+        }
+    }
+
+    /**
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     */
+    public function zipFlushBuffer() {
+        // Does nothing.
+    }
 }

@@ -25,7 +25,6 @@ class LengthMismatch extends \PHPZip\Zip\Core\AbstractException {
 	 * @param array $config Configuration array containing expected and written
 	 */
 	public function __construct(array $config){
-
 		$this->_expected = (string)$config['expected'];
 		$this->_written = (string)$config['written'];
 
@@ -38,19 +37,13 @@ class LengthMismatch extends \PHPZip\Zip\Core\AbstractException {
 		);
 
 		parent::__construct($message);
-
 	}
 
 	public function getExpected(){
-
 		return $this->_expected;
-
 	}
 
 	public function getWritten(){
-
 		return $this->_written;
-
 	}
-
 }

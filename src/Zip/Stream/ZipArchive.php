@@ -28,73 +28,20 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @throws \PHPZip\Zip\Exception\BufferNotEmpty, HeadersSent, IncompatiblePhpVersion, InvalidPhpConfiguration In case of errors
 	 */
 	public function __construct($fileName = '', $contentType = self::CONTENT_TYPE, $utf8FileName = null, $inline = false) {
-
 		parent::__construct(self::STREAM_CHUNK_SIZE);
-
-		$this->sendZip($fileName, $contentType, $utf8FileName, $inline);
-
+		$this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline);
 	}
 
 	/**
 	 * Destructor.
-	 * Perform clean up actions.
+	 * Perform clean up actions. 
+	 * Please note that frameworks are absolutely prohibited from sending ANYTHING to the output after the Zip is sent.
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 */
 	public function __destruct(){
-
 		$this->isFinalized = true;
 		$this->cdRec = null;
-
-		// TODO: does this really need to be here?
-		// If this is a library, and people are using it inside their projects,
-		// some frameworks like Yii perform their logging etc at the end of the request,
-		// so exiting here, will prevent those mechanisms from working.
-		exit(0);
-
-	}
-
-	/**
-	 * Close the archive.
-	 * A closed archive can no longer have new files added to it.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @return bool Success
-	 */
-	public function finalize() {
-
-		if (!$this->isFinalized) {
-
-			if (strlen($this->streamFilePath) > 0)
-				$this->closeStream();
-
-			$cdRecSize = pack("v", sizeof($this->cdRec));
-
-			$cd = implode("", $this->cdRec);
-
-			print($cd);
-			print(self::ZIP_END_OF_CENTRAL_DIRECTORY);
-			print($cdRecSize.$cdRecSize);
-			print(pack("VV", strlen($cd), $this->offset));
-
-			if (!empty($this->zipComment)) {
-				print(pack("v", strlen($this->zipComment)));
-				print($this->zipComment);
-			} else {
-				print("\x00\x00");
-			}
-
-			flush();
-
-			$this->isFinalized = true;
-			$this->cdRec = null;
-
-			return true;
-
-		}
-
-		return false;
 	}
 
 	/*
@@ -113,9 +60,7 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains zipEntry.
 	 */
 	public function onBuildZipEntry(array $params){
-
 		print($params['zipEntry']);
-
 	}
 
 	/**
@@ -128,9 +73,7 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains gzLength.
 	 */
 	public function onBeginAddFile(array $params){
-
 		// Do nothing.
-
 	}
 
 	/**
@@ -143,36 +86,30 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains gzData.
 	 */
 	public function onEndAddFile(array $params){
-
 		print($params['gzData']);
-
 	}
 
 	/**
 	 * Called by superclass when specialised action is needed
-	 * at the start of sending a zip stream.
+	 * at the start of sending the zip stream response header.
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 * @author Greg Kappatos
 	 */
-	public function onBeginSendZip(){
-
+	public function onBeginBuildResponseHeader(){
 		// Do nothing.
-
 	}
 
 	/**
 	 * Called by superclass when specialised action is needed
-	 * at the end of sending a zip stream.
+	 * at the end of sending the zip stream response header.
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 * @author Greg Kappatos
 	 */
-	public function onEndSendZip(){
-
+	public function onEndBuildResponseHeader(){
 		//header("Connection: Keep-Alive");
-		flush();
-
+		$this->zipFlushBuffer();
 	}
 
 	/**
@@ -183,9 +120,7 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @author Greg Kappatos
 	 */
 	public function onOpenStream(){
-
 		// Do nothing.
-
 	}
 
 	/**
@@ -198,10 +133,47 @@ class ZipArchive extends \PHPZip\Zip\Core\AbstractZipArchive {
 	 * @param array $params Array that contains data.
 	 */
 	public function onProcessFile(array $params){
-
 		print($params['data']);
-		flush();
-
+		$this->zipFlushBuffer();
 	}
 
+    /**
+     * Verify if the memory buffer is about to be exceeded.
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param int $gzLength length of the pending data.
+     */
+    public function zipVerifyMemBuffer($gzLength) {
+        // Does nothing.
+    }
+
+    /**
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param string $data
+     */
+    public function zipWrite($data) {
+        print($data);
+    }
+
+    /**
+     * Flush Zip Data stored in memory, to a temp file.
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     */
+    public function zipFlush() {
+        // Does nothing.
+    }
+
+    /**
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     */
+    public function zipFlushBuffer() {
+        flush();
+    }
 }

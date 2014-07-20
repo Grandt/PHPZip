@@ -1,3 +1,5 @@
+From http://fossies.org/linux/misc/unzip60.tar.gz/unzip60/proginfo/extrafld.txt
+----
 The following are the known types of zipfile extra fields as of this
 writing.  Extra fields are documented in PKWARE's appnote.txt and are
 intended to allow for backward- and forward-compatible extensions to

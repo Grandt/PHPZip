@@ -25,7 +25,6 @@ class BufferNotEmpty extends \PHPZip\Zip\Core\AbstractException {
 	 * @param array $config Configuration array containing outputBuffer and fileName
 	 */
 	public function __construct(array $config){
-
 		$this->_outputBuffer = $config['outputBuffer'];
 		$this->_fileName = isset($config['fileName']) ? $config['fileName'] : null;
 
@@ -33,19 +32,13 @@ class BufferNotEmpty extends \PHPZip\Zip\Core\AbstractException {
 		$message .= "Output buffer contains the following text (typically warning or errors):\n{$this->_outputBuffer}";
 
 		parent::__construct($message);
-
 	}
 
 	public function getOutputBuffer(){
-
 		return $this->_outputBuffer;
-
 	}
 
 	public function getFileName(){
-
 		return $this->_fileName;
-
 	}
-
 }

@@ -7,6 +7,14 @@ Rev. 2.0.0 - 2014-07-11
 
 * See issues #19 and #26 for more information.
 ---------------------------------------------------------------------
+Rev. 1.63 - 2014-07-14 (Never released)
+* Major clean up.
+* Fixed: Failure on systems running with mbstring.func_overload enabled. The morale is, don't use mbstring.func_overload, it'll kill any app working with binary data.. 
+
+Note.
+This will be the last release in the 1.x version range. 2.00 will include name spaces, and a major remodeling, courtesy of a pull request on GitHub.
+2.00 will likely not remain backwards compatible with 1.x, but should provide a far more stable platform to move forward on.
+---------------------------------------------------------------------
 Rev. 1.62 - 2014-03-25
 * Added: Support for the user to set their own temp file.
 - From Michele Locati, the submitter of this patch:

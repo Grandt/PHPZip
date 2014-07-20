@@ -26,7 +26,6 @@ class HeadersSent extends \PHPZip\Zip\Core\AbstractException {
 	 * @param array $config Configuration array containing headerFile, headerLine and fileName
 	 */
 	public function __construct(array $config){
-
 		$this->_headerFile = $config['headerFile'];
 		$this->_headerLine = $config['headerLine'];
 		$this->_fileName = isset($config['fileName']) ? $config['fileName'] : null;
@@ -35,25 +34,17 @@ class HeadersSent extends \PHPZip\Zip\Core\AbstractException {
 		$message .= "Headers have already been sent from '{$this->_headerFile}' in line {$this->_headerLine}";
 
 		parent::__construct($message);
-
 	}
 
 	public function getHeaderFile(){
-
 		return $this->_headerFile;
-
 	}
 
 	public function getHeaderLine(){
-
 		return $this->_headerLine;
-
 	}
 
 	public function getFileName(){
-
 		return $this->_fileName;
-
 	}
-
 }

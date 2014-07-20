@@ -25,7 +25,6 @@ class InvalidPhpConfiguration extends \PHPZip\Zip\Core\AbstractException {
 	 * @param array $config Configuration array containing php.ini settings: setting and expected (value)
 	 */
 	public function __construct(array $config){
-
 		$this->_setting = $config['setting'];
 		$this->_expected = $config['expected'];
 		$this->_actual = (string)@ini_get($this->_setting);
@@ -41,25 +40,17 @@ class InvalidPhpConfiguration extends \PHPZip\Zip\Core\AbstractException {
 		);
 
 		parent::__construct($message);
-
 	}
 
 	public function getSetting(){
-
 		return $this->_setting;
-
 	}
 
 	public function getExpected(){
-
 		return $this->_expected;
-
 	}
 
 	public function getActual(){
-
 		return $this->_actual;
-
 	}
-
 }
