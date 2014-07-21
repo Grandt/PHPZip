@@ -5,6 +5,7 @@
     "keywords": ["phpzip", "zip", "pkzip", "archive", "compressed", "compression", "stream"],
     "homepage": "https://github.com/Grandt/PHPZip",
     "license": "GNU LGPL 2.1",
+    "version": "2.0.1",
     "authors": [
         {
             "name": "Adam Schmalhofer",

@@ -1,3 +1,6 @@
+Rev. 2.0.1 - 2014-07-21
+* Fixed: Large files could fail to be added due to a problem in how the PHP ZipArchive would handle open temp files.
+---------------------------------------------------------------------
 Rev. 2.0.0 - 2014-07-11
 * Added: Namespace support.
 * Added: custom Exceptions.

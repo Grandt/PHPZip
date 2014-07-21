@@ -480,7 +480,7 @@ class ZipStream {
 		$tempZip = self::getTemporaryFile();
 
 		$zip = new ZipArchive;
-		$rv = $zip->open($tempZip);
+		$rv = $zip->open($tempZip, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
 		if ($rv === true) { // open returns true if successful, however one of the error values is 1, which will also read as true.
 			$zip->addFile($dataFile, 'file');

@@ -19,7 +19,7 @@ use PHPZip\Zip\Exception\LengthMismatch as LengthMismatchException;
 
 abstract class AbstractZipArchive {
 	const APP_NAME = 'PHPZip';
-	const VERSION = 1.63;
+	const VERSION = "2.0.1";
 	const MIN_PHP_VERSION = 5.3; // for namespaces
 
 	const CONTENT_TYPE = 'application/zip';
@@ -537,13 +537,13 @@ abstract class AbstractZipArchive {
 		$tempZip = self::getTemporaryFile();
 
 		$zip = new \ZipArchive;
-		$rv = $zip->open($tempZip);
+		$rv = $zip->open($tempZip, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
 		if ($rv === true) { // open returns true if successful, however one of the error values is 1, which will also read as true.
 			$zip->addFile($dataFile, 'file');
 			$zip->close();
 		} else {
-			// TODO: An error occured reading the ZipArchive tempp file (Seen on Windows installations)
+			// TODO: An error occured reading the ZipArchive temp file (Seen on Windows installations)
 		}
 
 		$handle = fopen($tempZip, "rb");
