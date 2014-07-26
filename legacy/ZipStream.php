@@ -486,7 +486,7 @@ class ZipStream {
 			$zip->addFile($dataFile, 'file');
 			$zip->close();
 		} else {
-			// TODO: An error occured reading the ZipArchive tempp file (Seen on Windows installations)
+			// TODO: An error occurred reading the ZipArchive temp file (Seen on Windows installations)
 		}
 
 		$handle = fopen($tempZip, "rb");
