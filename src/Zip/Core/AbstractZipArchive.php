@@ -10,7 +10,7 @@
 
 namespace PHPZip\Zip\Core;
 
-use PHPZip\Zip\Listener\ZipArchive as ZipArchiveListener;
+use PHPZip\Zip\Listener\ZipArchiveListeener as ZipArchiveListener;
 use PHPZip\Zip\Exception\IncompatiblePhpVersion as IncompatiblePhpVersionException;
 use PHPZip\Zip\Exception\InvalidPhpConfiguration as InvalidPhpConfigurationException;
 use PHPZip\Zip\Exception\HeadersSent as HeadersSentException;
@@ -543,7 +543,7 @@ abstract class AbstractZipArchive {
 			$zip->addFile($dataFile, 'file');
 			$zip->close();
 		} else {
-			// TODO: An error occured reading the ZipArchive temp file (Seen on Windows installations)
+			// TODO: An error occurred reading the ZipArchive temp file (Seen on Windows installations)
 		}
 
 		$handle = fopen($tempZip, "rb");

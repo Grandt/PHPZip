@@ -26,7 +26,7 @@ class ZipArchiveWebTest extends \PHPUnit_Extensions_SeleniumTestCase {
 		$this->open();
 		$this->assertEquals(true, true);
 
-		$ela = new \PHPZip\Zip\File\ZipArchive();
+		$ela = new \PHPZip\Zip\File\Zip();
 
 
 	}

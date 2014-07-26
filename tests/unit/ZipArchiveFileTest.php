@@ -12,7 +12,7 @@
 
 $loader = require '../vendor/autoload.php';
 
-use \PHPZip\Zip\File\ZipArchive as ZipArchiveFile;
+use \PHPZip\Zip\File\Zip as ZipArchiveFile;
 
 class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 
@@ -27,7 +27,7 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 //
 //		$zip = new ZipArchiveFile();
 //
-//		$this->assertInstanceOf('\PHPZip\Zip\File\ZipArchive', $zip, 'Failed to initialise ZipFileArchive.');
+//		$this->assertInstanceOf('\PHPZip\Zip\File\Zip', $zip, 'Failed to initialise ZipFileArchive.');
 //		$this->setExpectedException('\PHPZip\Zip\Exception\HeadersSent');
 //		self::_createAndSendZipArchive($zip);
 //
@@ -40,7 +40,7 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 //
 //		$zip = new ZipArchiveFile();
 //
-//		$this->assertInstanceOf('\PHPZip\Zip\File\ZipArchive', $zip, 'Failed to initialise ZipFileArchive.');
+//		$this->assertInstanceOf('\PHPZip\Zip\File\Zip', $zip, 'Failed to initialise ZipFileArchive.');
 //		echo "\ntest string\n";
 //		$this->setExpectedException('\PHPZip\Zip\Exception\BufferNotEmpty');
 //		self::_createAndSendZipArchive($zip);
@@ -55,7 +55,7 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 
 		$zip = new ZipArchiveFile();
 
-		//$this->assertInstanceOf('\PHPZip\Zip\File\ZipArchive', $zip, 'Failed to initialise ZipFileArchive.');
+		//$this->assertInstanceOf('\PHPZip\Zip\File\Zip', $zip, 'Failed to initialise ZipFileArchive.');
 
 		//$this->setRunTestInSeparateProcess(true);
 
@@ -198,7 +198,7 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 //		//$fileTime = date("D, d M Y H:i:s T");
 //		$zip = new ZipArchiveFile();
 //
-//		$this->assertInstanceOf('\PHPZip\Zip\File\ZipArchive', $zip, 'Failed to initialise ZipFileArchive.');
+//		$this->assertInstanceOf('\PHPZip\Zip\File\Zip', $zip, 'Failed to initialise ZipFileArchive.');
 //
 //		// Archive comments don't really support utf-8. Some tools detect and read it though.
 //		$zip->setComment("Example Zip file.\nАрхив Комментарий\nCreated on " . date('l jS \of F Y h:i:s A'));

@@ -12,7 +12,7 @@
 
 $loader = require '../vendor/autoload.php';
 
-use \PHPZip\Zip\Stream\ZipArchive as ZipArchiveStream;
+use \PHPZip\Zip\Stream\ZipStream as ZipArchiveStream;
 
 class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 
