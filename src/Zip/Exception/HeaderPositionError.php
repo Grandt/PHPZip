@@ -13,10 +13,10 @@ namespace PHPZip\Zip\Exception;
 
 use PHPZip\Zip\Core\AbstractException;
 
-class LengthMismatch extends AbstractException {
+class HeaderPositionError extends AbstractException {
 
 	private $_expected = null;
-	private $_written = null;
+	private $_actual = null;
 
 	/**
 	 * Constructor
@@ -28,14 +28,15 @@ class LengthMismatch extends AbstractException {
 	 */
 	public function __construct(array $config){
 		$this->_expected = (string)$config['expected'];
-		$this->_written = (string)$config['written'];
-
+		$this->_actual = (string)$config['actual'];
+		
 		$message = sprintf(
-			'%s %s %s %s',
-			'Length Mismatch Error: Expected',
+			'%s %s %s %s %s',
+			(string)($this->_actual - $this->_expected), 
+			' extra bytes before header. Expected pos ',
 			$this->_expected,
-			'bytes, wrote',
-			$this->_written
+			' but found the header at ',
+			$this->_actual
 		);
 
 		parent::__construct($message);
@@ -45,7 +46,7 @@ class LengthMismatch extends AbstractException {
 		return $this->_expected;
 	}
 
-	public function getWritten(){
-		return $this->_written;
+	public function getActual(){
+		return $this->_actual;
 	}
 }

@@ -11,7 +11,9 @@
 
 namespace PHPZip\Zip\Exception;
 
-class BufferNotEmpty extends \PHPZip\Zip\Core\AbstractException {
+use PHPZip\Zip\Core\AbstractException;
+
+class BufferNotEmpty extends AbstractException {
 
 	private $_outputBuffer = null;
 	private $_fileName = null;

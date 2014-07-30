@@ -19,7 +19,7 @@ use PHPZip\Zip\Exception\LengthMismatch as LengthMismatchException;
 
 abstract class AbstractZipArchive {
 	const APP_NAME = 'PHPZip';
-	const VERSION = "2.0.1";
+	const VERSION = "2.0.2";
 	const MIN_PHP_VERSION = 5.3; // for namespaces
 
 	const CONTENT_TYPE = 'application/zip';
@@ -993,11 +993,11 @@ abstract class AbstractZipArchive {
 	 *
 	 * @author Greg Kappatos
 	 *
-	 * @param \PHPZip\Zip\Core\AbstractException $exception Whatever exception needs to be thrown.
+	 * @param AbstractException $exception Whatever exception needs to be thrown.
 	 *
-	 * @throws \PHPZip\Zip\Core\AbstractException $exception
+	 * @throws AbstractException $exception
 	 */
-	private function _throwException(\PHPZip\Zip\Core\AbstractException $exception) {
+	private function _throwException(AbstractException $exception) {
 		$this->_notifyListeners('onException', array(
 			'exception' => $exception,
 		));

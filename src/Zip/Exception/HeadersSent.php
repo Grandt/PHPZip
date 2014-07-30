@@ -11,7 +11,9 @@
 
 namespace PHPZip\Zip\Exception;
 
-class HeadersSent extends \PHPZip\Zip\Core\AbstractException {
+use PHPZip\Zip\Core\AbstractException;
+
+class HeadersSent extends AbstractException {
 
 	private $_headerFile = null;
 	private $_headerLine = null;

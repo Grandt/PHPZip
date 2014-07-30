@@ -10,7 +10,9 @@
 
 namespace PHPZip\Zip\Stream;
 
-class ZipStream extends \PHPZip\Zip\Core\AbstractZipArchive {
+use PHPZip\Zip\Core\AbstractZipArchive;
+
+class ZipStream extends AbstractZipArchive {
 
 	const STREAM_CHUNK_SIZE = 16384; // 16 KB
 

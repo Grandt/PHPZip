@@ -11,7 +11,9 @@
 
 namespace PHPZip\Zip\Exception;
 
-class InvalidPhpConfiguration extends \PHPZip\Zip\Core\AbstractException {
+use PHPZip\Zip\Core\AbstractException;
+
+class InvalidPhpConfiguration extends AbstractException {
 
 	private $_setting = null;
 	private $_expected = null;

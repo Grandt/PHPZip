@@ -1,3 +1,6 @@
+Rev. 2.0.2 - 2014-07-30
+* Added: Added ZipMerge utility. Allows preexisting zip files to be merged into one on the fly, streamed to the client. TODO: Add appendZip function to AbstractZipArchive.
+---------------------------------------------------------------------
 Rev. 2.0.1 - 2014-07-21
 * Fixed: Large files could fail to be added due to a problem in how the PHP ZipArchive would handle open temp files.
 ---------------------------------------------------------------------

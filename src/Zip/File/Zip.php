@@ -10,7 +10,9 @@
 
 namespace PHPZip\Zip\File;
 
-class Zip extends \PHPZip\Zip\Core\AbstractZipArchive {
+use PHPZip\Zip\Core\AbstractZipArchive;
+
+class Zip extends AbstractZipArchive {
 
 	const MEMORY_THRESHOLD = 1048576; // 1 MB - Auto create temp file if the zip data exceeds this
 	const STREAM_CHUNK_SIZE = 65536; // 64 KB
@@ -287,7 +289,7 @@ class Zip extends \PHPZip\Zip\Core\AbstractZipArchive {
      * @param int $gzLength length of the pending data.
      */
     public function zipVerifyMemBuffer($gzLength) {
-        if (!is_resource($this->zipFile) && ($this->offset + $gzLength) > $this->zipMemoryThreshold) {
+        if (!is_resource($this->_zipFile) && ($this->offset + $gzLength) > self::MEMORY_THRESHOLD) {
             $this->zipFlush();
         }
     }
@@ -299,11 +301,11 @@ class Zip extends \PHPZip\Zip\Core\AbstractZipArchive {
      * @param string $data
      */
     public function zipWrite($data) {
-        if (!is_resource($this->zipFile)) {
-            $this->zipData .= $data;
+        if (!is_resource($this->_zipData)) {
+            $this->_zipData .= $data;
         } else {
-            fwrite($this->zipFile, $data);
-            fflush($this->zipFile);
+            fwrite($this->_zipFile, $data);
+            fflush($this->_zipFile);
         }
     }
 
@@ -314,10 +316,10 @@ class Zip extends \PHPZip\Zip\Core\AbstractZipArchive {
      *
      */
     public function zipFlush() {
-        if (!is_resource($this->zipFile)) {
-            $this->zipFile = tmpfile();
-            fwrite($this->zipFile, $this->zipData);
-            $this->zipData = null;
+        if (!is_resource($this->_zipFile)) {
+            $this->_zipFile = tmpfile();
+            fwrite($this->_zipFile, $this->_zipData);
+            $this->_zipData = null;
         }
     }
 

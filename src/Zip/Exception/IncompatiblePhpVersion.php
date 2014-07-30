@@ -11,7 +11,9 @@
 
 namespace PHPZip\Zip\Exception;
 
-class IncompatiblePhpVersion extends \PHPZip\Zip\Core\AbstractException {
+use PHPZip\Zip\Core\AbstractException;
+
+class IncompatiblePhpVersion extends AbstractException {
 
 	private $_minVersion = null;
 	private $_currentVersion = null;
