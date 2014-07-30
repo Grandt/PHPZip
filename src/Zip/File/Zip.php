@@ -301,8 +301,8 @@ class Zip extends AbstractZipArchive {
      * @param string $data
      */
     public function zipWrite($data) {
-        if (!is_resource($this->_zipData)) {
-            $this->_zipData .= $data;
+        if (!is_resource($this->_zipFile)) {
+           $this->_zipData .= $data;
         } else {
             fwrite($this->_zipFile, $data);
             fflush($this->_zipFile);
