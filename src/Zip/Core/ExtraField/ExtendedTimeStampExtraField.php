@@ -8,6 +8,7 @@
  */
 
 namespace PHPZip\Zip\Core\ExtraField;
+use PHPZip\Zip\Core\ZipUtils;
 
 /**
  *         -Extended Timestamp Extra Field:
@@ -85,9 +86,9 @@ class ExtendedTimeStampExtraField extends AbstractExtraField {
 			$this->length					= $arr['length'];
 			$this->flags					= $arr['flags'] & 0xff;
 			$consumed = 1;
-			$this->isModTimeSet = AbstractExtraField::testBit($this->flags, 0);
-			$this->isAcTimeSet = AbstractExtraField::testBit($this->flags, 1);
-			$this->isCrTimeSet = AbstractExtraField::testBit($this->flags, 2);
+			$this->isModTimeSet = ZipUtils::testBit($this->flags, 0);
+			$this->isAcTimeSet = ZipUtils::testBit($this->flags, 1);
+			$this->isCrTimeSet = ZipUtils::testBit($this->flags, 2);
 
 			if ($this->isModTimeSet && $consumed < $this->length) {
 				$arr = unpack('V', fread($handle, 4));
@@ -129,11 +130,11 @@ class ExtendedTimeStampExtraField extends AbstractExtraField {
 			. ($this->isAcTimeSet ? pack('V', $this->acTime) : '') 
 			. ($this->isCrTimeSet ? pack('V', $this->crTime) : '');
 		$flags = 0;
-		AbstractExtraField::setBit($flags, 0, $this->isModTimeSet);
-		AbstractExtraField::setBit($flags, 1, $this->isAcTimeSet);
-		AbstractExtraField::setBit($flags, 2, $this->isCrTimeSet);
+        ZipUtils::setBit($flags, 0, $this->isModTimeSet);
+        ZipUtils::setBit($flags, 1, $this->isAcTimeSet);
+        ZipUtils::setBit($flags, 2, $this->isCrTimeSet);
 		
-		return parent::HEADER_EXTENDED_TIMESTAMP . pack('vc', 1 + strlen($ts), $flags) . $ts;
+		return parent::HEADER_EXTENDED_TIMESTAMP . pack('vc', 1 +  ZipUtils::bin_strlen($ts), $flags) . $ts;
 	}
 
 	/**
@@ -142,10 +143,10 @@ class ExtendedTimeStampExtraField extends AbstractExtraField {
 	public function getCentralField() {
 		$ts = ($this->isModTimeSet ? pack('V', $this->modTime) : '');
 		$flags = 0;
-		AbstractExtraField::setBit($flags, 0, $this->isModTimeSet);
-		AbstractExtraField::setBit($flags, 1, $this->isAcTimeSet);
-		AbstractExtraField::setBit($flags, 2, $this->isCrTimeSet);
+        ZipUtils::setBit($flags, 0, $this->isModTimeSet);
+        ZipUtils::setBit($flags, 1, $this->isAcTimeSet);
+        ZipUtils::setBit($flags, 2, $this->isCrTimeSet);
 		
-		return parent::HEADER_EXTENDED_TIMESTAMP . pack('vc', 1 + strlen($ts), $flags) . $ts;
+		return parent::HEADER_EXTENDED_TIMESTAMP . pack('vc', 1 +  ZipUtils::bin_strlen($ts), $flags) . $ts;
 	}
 }

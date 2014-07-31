@@ -11,11 +11,11 @@ ini_set('max_execution_time', 600);
 require 'bootstrap.php';
 
 
-$outFile = "merged_file4.zip";
+$outFile = "ZipMerge.Example1.zip";
 
 $zipMerge = new PHPZip\Zip\Stream\ZipMerge($outFile);
 //$zipMerge->appendZip("../testData/500k.zip", "TrueCryptRandomFile");
-$zipMerge->appendZip("../testData/test.zip", "A-book/");
+$zipMerge->appendZip("../testData/test.zip", "Sub Dir test/");
 $zipMerge->appendZip("../testData/test.zip", "");
 /*
 $handle = fopen("ZipStreamExample1.zip", 'r');

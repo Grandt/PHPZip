@@ -9,6 +9,8 @@
 
 namespace PHPZip\Zip\Core\ExtraField;
 
+use PHPZip\Zip\Core\ZipUtils;
+
 abstract class AbstractExtraField {
 	const HEADER_UNIX_TYPE_1 = 'UX';			// \x55\x58 or 0x5855 It has been replaced by the extended-timestamp extra block 'UT' (0x5455) and the Unix type 2 extra block 'Ux' (0x7855).
 	const HEADER_UNIX_TYPE_2 = 'Ux';			// \x55\x78 or 0x7855
@@ -96,26 +98,13 @@ abstract class AbstractExtraField {
 
     public static function encodeField($header, $data) {
         if ($header != null) {
-            return $header . pack('v', strlen($data)) . $data;
+            return $header . pack('v',  ZipUtils::bin_strlen($data)) . $data;
         }
         return '';
     }
 
-	public static function testBit($data, $bit) {
-		$bv = 1 << $bit;
-		return ($data & $bv) == $bv;
-	}
-
-	public static function setBit(&$data, $bit, $value = true) {
-		if ($value) {
-			$data |= (1 << $bit);
-		} else {
-			self::clrBit($data, $bit);
-		}
-		
-	}
-
-	public static function clrBit(&$data, $bit) {
-		$data &= ~(1 << $bit);
-	}
+    public function setFieldData($localFieldData, $centralFieldData = null) {
+        $this->localData	= $localFieldData;
+        $this->centralData	= $centralFieldData;
+    }
 }

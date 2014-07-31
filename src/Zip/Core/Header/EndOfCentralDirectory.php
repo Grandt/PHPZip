@@ -9,6 +9,8 @@
 
 namespace PHPZip\Zip\Core\Header;
 
+use PHPZip\Zip\Core\ZipUtils;
+
 class EndOfCentralDirectory extends AbstractZipHeader {
     public $offset;
 
@@ -62,7 +64,7 @@ class EndOfCentralDirectory extends AbstractZipHeader {
     }
 
     public function __toString() {
-        $this->zipCommentLength = strlen($this->zipComment);
+        $this->zipCommentLength = ZipUtils::bin_strlen($this->zipComment);
         $eocd = AbstractZipHeader::ZIP_END_OF_CENTRAL_DIRECTORY;
         $eocd .= pack("vvvv", $this->thisDisk, $this->firstCDDisk, $this->cdrCount1, $this->cdrCount2);
         $eocd .= pack("VVv", $this->cdrLength, $this->cdrStart, $this->zipCommentLength);
@@ -72,12 +74,5 @@ class EndOfCentralDirectory extends AbstractZipHeader {
             $eocd .= AbstractZipHeader::NULL_WORD;
         }
         return $eocd;
-    }
-
-    /**
-     * @return string Header Signature
-     */
-    public function getHeaderSignature() {
-        return AbstractZipHeader::ZIP_END_OF_CENTRAL_DIRECTORY;
     }
 }

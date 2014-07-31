@@ -24,7 +24,6 @@ abstract class AbstractZipHeader {
 	const NULL_WORD = "\x00\x00";
 	const NULL_DWORD = "\x00\x00\x00\x00";
 
-    abstract public function getHeaderSignature();
     abstract public function parseHeader($handle);
 
     public static function pathJoin($dir, $file) {

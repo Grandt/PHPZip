@@ -3,14 +3,15 @@
 namespace PHPZip\Zip\Stream;
 
 use PHPZip\Zip\Core\AbstractException;
-use PHPZip\Zip\Core\AbstractZipArchive;
 use PHPZip\Zip\Core\Header\EndOfCentralDirectory;
 use PHPZip\Zip\Core\Header\ZipFileEntry;
 use PHPZip\Zip\Core\Header\AbstractZipHeader;
+use PHPZip\Zip\Core\ZipUtils;
 use PHPZip\Zip\Exception\HeaderPositionError;
 use PHPZip\Zip\Exception\BufferNotEmpty;
 use PHPZip\Zip\Exception\HeadersSent;
 use PHPZip\Zip\Exception\IncompatiblePhpVersion;
+use PHPZip\Zip\Listener\ZipArchiveListener;
 
 /**
  * Description of PHPZipMerge
@@ -65,19 +66,12 @@ class ZipMerge {
         if (!empty($subPath)) {
             $subPath = str_replace("\\", '/', $subPath);
             $subPath = rtrim($subPath, '/') . '/';
-/*
-            $fileEntry = new ZipFileEntry();
-            $fileEntry->gzType = 0;
-            $fileEntry->gpFlags = 0;
-            $fileEntry->fileCRC32 = 0;
-            $fileEntry->externalFileAttributes = ZipFileEntry::EXT_FILE_ATTR_DIR;
-            $fileEntry->gzLength = 0;
-            $fileEntry->dataLength = 0;
-            $fileEntry->isDirectory = true;
 
+            $fileEntry = ZipFileEntry::createDirEntry($subPath, time());
+            $this->zipWrite($fileEntry->getLocalHeader());
             $this->FILES[$this->LFHindex++] = $fileEntry;
             $this->CDRindex++;
-*/
+
         }
 		
 		if (is_string($file) && is_file($file)) {
@@ -122,7 +116,7 @@ class ZipMerge {
                 $fileEntry->prependPath($subPath);
 
 				$lf = $fileEntry->getLocalHeader();
-				$lfLen = $this->bin_strlen($lf);
+				$lfLen =  ZipUtils::bin_strlen($lf);
 				$this->zipWrite($lf);
 				fseek($handle, $fileEntry->offset + $fileEntry->dataOffset, SEEK_SET);
 				if (!$fileEntry->isDirectory) {
@@ -162,7 +156,7 @@ class ZipMerge {
                 $this->eocd->cdrCount1++;
 				$cd = $fileEntry->getCentralDirectoryHeader();
 
-				$this->eocd->cdrLength += $this->bin_strlen($cd);
+				$this->eocd->cdrLength += ZipUtils::bin_strlen($cd);
 				$this->zipWrite($cd);
 			}
 
@@ -201,7 +195,7 @@ class ZipMerge {
 		$zlibConfig = 'zlib.output_compression';
 
 		$ob = ob_get_contents();
-		if ($ob !== false && strlen($ob)) {
+		if ($ob !== false && ZipUtils::bin_strlen($ob)) {
 			$this->_throwException(new BufferNotEmpty(array(
 				'outputBuffer' => $ob,
 				'fileName' => $fileName,
@@ -242,40 +236,6 @@ class ZipMerge {
 	}
 
 	/**
-	 * Initialize the vars that'll allow us to override mbstring.func_overload, if needed.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @return bool true if mbstring.func_overload is enabled.
-	 */
-	public static function isMBStringOveridden() {
-		static $has_mb_overload = null;
-		if ($has_mb_overload ===  null) {
-			$has_mbstring = extension_loaded('mbstring');
-			$has_mb_shadow = (int) ini_get('mbstring.func_overload');
-			$has_mb_overload = $has_mbstring && ($has_mb_shadow & 2);
-		}
-		return $has_mb_overload;
-	}
-
-	/**
-	 * Wrapper of strlen to escapt bmstring.func_overload.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @param string $string
-	 *
-	 * @return int byte length of the string parsed.
-	 */
-	public function bin_strlen($string) {
-		if (self::isMBStringOveridden()) {
-		   return mb_strlen($string,'latin1');
-		} else {
-		   return strlen($string);
-		}
-	}
-
-	/**
 	 * Check PHP version.
 	 *
 	 * @author A. Grandt <php@grandt.com>
@@ -294,9 +254,35 @@ class ZipMerge {
 
     /*
      * ************************************************************************
-     * Private methods.
+     * Listener methods.
      * ************************************************************************
      */
+
+    /**
+     * Listen to events fired by this class.
+     *
+     * @author Greg Kappatos
+     *
+     * @param ZipArchiveListener $listener Class that implements the ZipArchiveListener interface.
+     */
+    public function addListener(ZipArchiveListener $listener) {
+        $this->_listeners[] = $listener;
+    }
+
+    /**
+     * Stop listening to events fired by this class.
+     *
+     * @author Greg Kappatos
+     *
+     * @param ZipArchiveListener $listener Class that implements the ZipArchiveListener interface.
+     */
+    public function removeListener(ZipArchiveListener $listener) {
+        $key = array_search($listener, $this->_listeners);
+
+        if ($key !== false) {
+            unset($this->_listeners[$key]);
+        }
+    }
 
     /**
      * Helper method to fire appropriate event.

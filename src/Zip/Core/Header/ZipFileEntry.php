@@ -10,7 +10,10 @@
 namespace PHPZip\Zip\Core\Header;
 
 use PHPZip\Zip\Core\ExtraField\AbstractExtraField;
+use PHPZip\Zip\Core\ExtraField\ExtendedTimeStampExtraField;
+use PHPZip\Zip\Core\ExtraField\GenericExtraField;
 use PHPZip\Zip\Core\ExtraField\UnicodeCommentExtraField;
+use PHPZip\Zip\Core\ZipUtils;
 
 class ZipFileEntry extends AbstractZipHeader {
 	public $versionMadeBy = AbstractZipHeader::ATTR_MADE_BY_VERSION;
@@ -204,8 +207,8 @@ class ZipFileEntry extends AbstractZipHeader {
 		$lf .= pack("vv", $this->gpFlags, $this->gzType);
 		$lf .= $this->dosTime;
 		$lf .= pack("VVV", $this->fileCRC32, $this->gzLength, $this->dataLength);
-		$lf .= pack("v", strlen($this->path));
-		$lf .= pack("v", strlen($ef));
+		$lf .= pack("v", ZipUtils::bin_strlen($this->path));
+		$lf .= pack("v", ZipUtils::bin_strlen($ef));
 
 		$lf .= $this->path;
 		$lf .= $ef;
@@ -224,9 +227,9 @@ class ZipFileEntry extends AbstractZipHeader {
 		$cd .= pack("vv", $this->gpFlags, $this->gzType);
 		$cd .= $this->dosTime;
 		$cd .= pack("VVV", $this->fileCRC32, $this->gzLength, $this->dataLength);
-		$cd .= pack("v", strlen($this->path));
-		$cd .= pack("v", strlen($ef));
-		$cd .= pack("v", strlen($this->comment));
+		$cd .= pack("v", ZipUtils::bin_strlen($this->path));
+		$cd .= pack("v", ZipUtils::bin_strlen($ef));
+		$cd .= pack("v", ZipUtils::bin_strlen($this->comment));
 		$cd .= $this->discNumberStart. $this->internalFileAttributes . $this->externalFileAttributes;
 		$cd .= pack("V", $this->offset);
 		
@@ -236,13 +239,6 @@ class ZipFileEntry extends AbstractZipHeader {
 
 		return $cd;
 	}
-
-    /**
-     * @return string Header Signature
-     */
-    public function getHeaderSignature() {
-        return AbstractZipHeader::ZIP_LOCAL_FILE_HEADER;
-    }
 
     public function prependPath($path) {
 		$this->path = AbstractZipHeader::pathJoin($path, $this->path);
@@ -272,4 +268,32 @@ class ZipFileEntry extends AbstractZipHeader {
 			$ef->utf8Data = $comment;
 		}
 	}
+
+    public static function createDirEntry($path, $timestamp) {
+        $fileEntry = new ZipFileEntry();
+
+        $fileEntry->gzType = 0;
+        $fileEntry->gpFlags = 0;
+        $fileEntry->fileCRC32 = 0;
+        $fileEntry->externalFileAttributes = ZipFileEntry::EXT_FILE_ATTR_DIR;
+        $fileEntry->gzLength = 0;
+        $fileEntry->dataLength = 0;
+        $fileEntry->isDirectory = true;
+        $fileEntry->dosTime = ZipUtils::getDosTime($timestamp);
+        $fileEntry->path = $path;
+
+        $ef = new ExtendedTimeStampExtraField();
+        $ef->setModTime($timestamp);
+        $ef->setAccessTime($timestamp);
+
+        $fileEntry->addExtraField($ef);
+
+        $ef = new GenericExtraField();
+        $ef->header = AbstractExtraField::HEADER_UNIX_TYPE_3;
+        $ef->setFieldData("\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00", '');
+
+        $fileEntry->addExtraField($ef);
+
+        return $fileEntry;
+    }
 }

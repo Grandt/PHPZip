@@ -12,7 +12,7 @@
 
 namespace PHPZip\Zip\Listener;
 
-interface ZipArchiveListeener {
+interface ZipArchiveListener {
 
 	/**
 	 * Event fired after a zip entry has been successfully built.
