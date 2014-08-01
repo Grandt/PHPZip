@@ -13,9 +13,17 @@ $errors = "";
  * And a demonstration on why the author of the script calling zip
  *  needs to be diligent not to add extra characters to the output.
  */
-include_once("ZipStream.php");
 
-$zip = new ZipStream("test.zip");
+
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe ZipStream( to
+// new \PHPZip\Zip\Stream\ZipStream(
+// The parameters are unchanged.
+
+require_once('bootstrap.php'); // include_once("ZipStream.php");
+
+$zip = new \PHPZip\Zip\Stream\ZipStream('test.zip'); // $zip = new ZipStream("test.zip");
 
 /*
  * As seen in the output, the above construct with a PHP end and start tag after

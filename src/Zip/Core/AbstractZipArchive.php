@@ -946,8 +946,11 @@ abstract class AbstractZipArchive {
 	 */
 	private function _notifyListeners($method = null, array $data = array()) {
 		if (is_null($method)) {
-			$trace = debug_backtrace()[1];
-			$method = 'on' . ucwords($trace['function']);
+			$backtrace = debug_backtrace();
+            if (sizeof($backtrace) > 0) {
+                $trace = $backtrace[1];
+    			$method = 'on' . ucwords($trace['function']);
+            }
 		}
 
 		foreach ($this->_listeners as $listener) {

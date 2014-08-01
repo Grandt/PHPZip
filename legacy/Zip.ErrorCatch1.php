@@ -11,10 +11,15 @@ $errors = "";
 $fileDir = './';
 ob_start(); // This is only to show that ob_start can be called, however the buffer must be empty when sending.
 
-include_once("Zip.php");
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe Zip( to
+// new \PHPZip\Zip\File\Zip(
+// The parameters are unchanged.
+require_once('bootstrap.php'); // include_once("Zip.php");
 $fileTime = date("D, d M Y H:i:s T");
 
-$zip = new Zip();
+$zip = new \PHPZip\Zip\File\Zip(); // $zip = new Zip();
 // Archive comments don't really support utf-8. Some tools detect and read it though.
 $zip->setComment("Example Zip file.\nАрхив Комментарий\nCreated on " . date('l jS \of F Y h:i:s A'));
 // A bit of Russian (I hope), to test UTF-8 file names. (Note. I'm not Russian, and don't speak the language, this is just for testing)

@@ -11,6 +11,7 @@
 namespace PHPZip\Zip\File;
 
 use PHPZip\Zip\Core\AbstractZipArchive;
+use PHPZip\Zip\Core\ZipUtils;
 
 class Zip extends AbstractZipArchive {
 
@@ -168,7 +169,7 @@ class Zip extends AbstractZipArchive {
 	 */
 	public function getArchiveSize() {
 		if (!is_resource($this->_zipFile)) {
-			return parent::bin_strlen($this->_zipData);
+			return ZipUtils::bin_strlen($this->_zipData);
 		}
 
 		$stat = fstat($this->_zipFile);

@@ -11,7 +11,13 @@ $errors = "";
 $fileDir = './';
 ob_start(); // This is only to show that ob_start can be called, however the buffer must be empty when sending.
 
-include_once("Zip.php");
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe Zip( to
+// new \PHPZip\Zip\File\Zip(
+// The parameters are unchanged.
+
+require_once('bootstrap.php'); // include_once("Zip.php");
 $fileTime = date("D, d M Y H:i:s T");
 
 // Set a temp file to use, instead of the default system temp file directory.
@@ -20,9 +26,9 @@ $fileTime = date("D, d M Y H:i:s T");
 
 // Setting this to a function to create the temp files requires PHP 5.3 or newer:
 //Zip::$temp = function() { return tempnam(sys_get_temp_dir(), 'Zip');};
-Zip::$temp = function() { return "./tempFile_" . rand(100000, 999999);};
+\PHPZip\Zip\File\Zip::$temp = function() { return "./tempFile_" . rand(100000, 999999);};
 
-$zip = new Zip();
+$zip = new \PHPZip\Zip\File\Zip(); // $zip = new Zip();
 // Archive comments don't really support utf-8. Some tools detect and read it though.
 $zip->setComment("Example Zip file.\nCreated on " . date('l jS \of F Y h:i:s A'));
 $zip->addFile("Hello World!", "hello.txt");

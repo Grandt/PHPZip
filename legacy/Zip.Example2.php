@@ -10,10 +10,16 @@ $errors = "";
 // Make a copy, also to the current dir, for good measure.
 $fileDir = './';
 
-include_once("Zip.php");
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe Zip( to
+// new \PHPZip\Zip\File\Zip(
+// The parameters are unchanged.
+
+require_once('bootstrap.php'); // include_once("Zip.php");
 $fileTime = date("D, d M Y H:i:s T");
 
-$zip = new Zip();
+$zip = new \PHPZip\Zip\File\Zip(); // $zip = new Zip();
 $zip->setZipFile("ZipExample.zip");
 
 $zip->setComment("Example Zip file.\nCreated on " . date('l jS \of F Y h:i:s A'));

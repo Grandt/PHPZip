@@ -14,7 +14,14 @@ $errors = "";
 //ini_set('memory_limit', '512M');
 //ini_set('max_execution_time', 120);
 
-include_once("ZipStream.php");
+
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe ZipStream( to
+// new \PHPZip\Zip\Stream\ZipStream(
+// The parameters are unchanged.
+
+require_once('bootstrap.php'); // include_once("ZipStream.php");
 //print_r(ini_get_all());
 
 $fileTime = date("D, d M Y H:i:s T");
@@ -25,7 +32,8 @@ $chapter1 = "Chapter 1\n"
 
 //$zip = new ZipStream("ZipStreamExample1s.zip");
 //$zip = new ZipStream("ZipStreamExample1s_€2,000.zip");
-$zip = new ZipStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
+$zip = new \PHPZip\Zip\Stream\ZipStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
+    // $zip = new ZipStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
 
 // Archive comments don't really support utf-8. Some tools detect and read it though.
 $zip->setComment("Example Zip file for Large file sets.\nАрхив Комментарий\nCreated on " . date('l jS \of F Y h:i:s A'));

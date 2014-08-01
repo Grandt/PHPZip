@@ -14,7 +14,13 @@ $extime = ini_get('max_execution_time');
 ////ini_set('memory_limit', '512M');
 ini_set('max_execution_time', 600);
 
-include_once("ZipStream.php");
+// To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
+// The changes to your Zip use are limited to two lines after that is in place.
+// Require your bootstrap.php, or the autoload.php, and change the class instantiation from nwe ZipStream( to
+// new \PHPZip\Zip\Stream\ZipStream(
+// The parameters are unchanged.
+
+require_once('bootstrap.php'); // include_once("ZipStream.php");
 //print_r(ini_get_all());
 
 $fileTime = date("D, d M Y H:i:s T");
@@ -23,7 +29,7 @@ $chapter1 = "Chapter 1\n"
 		. "Lorem ipsum\n"
 		. "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec magna lorem, mattis sit amet porta vitae, consectetur ut eros. Nullam id mattis lacus. In eget neque magna, congue imperdiet nulla. Aenean erat lacus, imperdiet a adipiscing non, dignissim eget felis. Nulla facilisi. Vivamus sit amet lorem eget mauris dictum pharetra. In mauris nulla, placerat a accumsan ac, mollis sit amet ligula. Donec eget facilisis dui. Cras elit quam, imperdiet at malesuada vitae, luctus id orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque eu libero in leo ultrices tristique. Etiam quis ornare massa. Donec in velit leo. Sed eu ante tortor.\n";
 
-$zip = new ZipStream("ZipStreamExample1.zip");
+$zip = new \PHPZip\Zip\Stream\ZipStream('ZipStreamExample1.zip'); // $zip = new ZipStream("ZipStreamExample1.zip");
 
 $zip->setComment("Example Zip file for Large file sets.\nCreated on " . date('l jS \of F Y h:i:s A'));
 $zip->addFile("Hello World!\r\n", "Hello.txt");
