@@ -5,13 +5,8 @@
     "keywords": ["phpzip", "zip", "pkzip", "archive", "compressed", "compression", "stream"],
     "homepage": "https://github.com/Grandt/PHPZip",
     "license": "GNU LGPL 2.1",
-    "version": "2.0.1",
+    "version": "2.0.3",
     "authors": [
-        {
-            "name": "Adam Schmalhofer",
-            "email": "Adam.Schmalhofer@gmx.de",
-            "role": "Developer"
-        },
         {
             "name": "A. Grandt",
             "email": "php@grandt.com",
@@ -21,6 +16,11 @@
         {
             "name": "Greg Kappatos",
             "homepage": "http://websiteconnect.com.au",
+            "role": "Developer"
+        },
+        {
+            "name": "Adam Schmalhofer",
+            "email": "Adam.Schmalhofer@gmx.de",
             "role": "Developer"
         }
     ],

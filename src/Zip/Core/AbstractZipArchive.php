@@ -21,7 +21,7 @@ use PHPZip\Zip\Stream\ZipMerge;
 
 abstract class AbstractZipArchive {
 	const APP_NAME = 'PHPZip';
-	const VERSION = "2.0.2";
+	const VERSION = "2.0.3";
 	const MIN_PHP_VERSION = 5.3; // for namespaces
 
 	const CONTENT_TYPE = 'application/zip';
