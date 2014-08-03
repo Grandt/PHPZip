@@ -1,5 +1,5 @@
 <?php
-set_error_handler("customError");
+//set_error_handler("customError");
 error_reporting(E_ALL | E_STRICT);
 ini_set('error_reporting', E_ALL | E_STRICT);
 ini_set('display_errors', 1);
@@ -8,7 +8,7 @@ $errors = "";
 
 // Example. Zip all .html files in the current directory and send the file for Download.
 // Also adds a static text "Hello World!" to the file Hello.txt
-$fileDir = './';
+$fileDir = '../testData/test';
 ob_start(); // This is only to show that ob_start can be called, however the buffer must be empty when sending.
 
 // To use the new namespaces, you need a bootstrapper/autoloader, examples are provided here.
@@ -21,6 +21,7 @@ require_once('bootstrap.php'); // include_once("Zip.php");
 $fileTime = date("D, d M Y H:i:s T");
 
 $zip = new \PHPZip\Zip\File\Zip(); // new Zip();
+/*
 // Archive comments don't really support utf-8. Some tools detect and read it though.
 $zip->setComment("Example Zip file.\nАрхив Комментарий\nCreated on " . date('l jS \of F Y h:i:s A'));
 // A bit of Russian (I hope), to test UTF-8 file names.
@@ -30,7 +31,7 @@ $zip->addFile("Hello World!", "hello.txt");
 
 @$handle = opendir($fileDir);
 if ($handle) {
-    /* This is the correct way to loop over the directory. */
+    // This is the correct way to loop over the directory.
     while (false !== ($file = readdir($handle))) {
         if (strpos($file, ".php") !== false) {
             $pathData = pathinfo($fileDir . $file);
@@ -40,7 +41,7 @@ if ($handle) {
         }
     }
 }
-
+*/
 // Add a directory, first recursively, then the same directory, but without recursion.
 // Naturally this requires you to change the path to ../test to point to a directory of your own.
 // $zip->addDirectoryContent("testData/test", "recursiveDir/test");
@@ -48,7 +49,8 @@ if ($handle) {
 
 //$zip->sendZip("ZipExample1.zip");
 //$zip->sendZip("ZipExample1_€2,000.zip");
-
+$zip->appendZip("../testData/test.zip", "appendedZip1/appendedZip2/../appendedZip3/appendedZip4/");
+$zip->appendZip('../testData/test.zip', '/');
 $zip->sendZip("ZipExample1_€2,000.zip", "application/zip", "ZipExample1_€2,000_utf8.zip");
 
 // If non-fatal errors occurred during execution, this will append them

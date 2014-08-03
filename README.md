@@ -5,7 +5,9 @@ Zip      : http://www.phpclasses.org/package/6110
 ZipStream: http://www.phpclasses.org/package/6616
 
 *****************************************************************************************************************
-WARNING: THE CURRENT VERSION OF PHPZip *WILL* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
+WARNING: THE CURRENT VERSION OF PHPZip *MAY* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
+OLDER VERSIONS OF PHPZip *WILL* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
+EXPERIMENTAL FEATURES HAVE BEEN ADDED TO ALLEVIATE THE LOBOTOMIZATION OF PHP, CAUSED BY mbstring.func_overload
 *****************************************************************************************************************
 
 Note: PHPZip currently uses the 32-bit deflate, and is limited by that.
@@ -20,7 +22,6 @@ NOTE: Please ensure that output buffering is disabled when using especially ZipS
 NOTE2: THe Zip and ZipStream classes support UTF-8 in file paths and file comments, and will autodetect UTF-8 strings to that end, however it is up to the user to ensure that other Multibyte chracter sets aren't sent to the class.
 
 TODO:
-* Add compression level (at least "compress or store") to ZipStream, and to the Large file option on Zip.php
 * Documentation, no one reads it, but everyone complains if it is missing.
 * Better examples to fully cover the capabilities of the Zip classes.
 * more TODO's.

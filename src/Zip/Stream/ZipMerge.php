@@ -1,8 +1,20 @@
 <?php
+/**
+ * ZipMerge will allow the user to combine multiple Zip files into one, while streaming the result directly to
+ *  the client.
+ * The contents of the Zip Files added will NOT be re-compressed.
+ *
+ * The primary use is for the user to be able to pre-assemble often used, static content, saving server time on
+ *  subsequent use.
+ * Another use case is to combine collections of for existing packages/collections of data the client may have
+ *  purchased, and allow them to download these on the fly in a single file.
+ * @author Grandt
+ */
 
 namespace PHPZip\Zip\Stream;
 
 use PHPZip\Zip\Core\AbstractException;
+use PHPZip\Zip\Core\AbstractZipArchive;
 use PHPZip\Zip\Core\Header\EndOfCentralDirectory;
 use PHPZip\Zip\Core\Header\ZipFileEntry;
 use PHPZip\Zip\Core\Header\AbstractZipHeader;
@@ -13,17 +25,15 @@ use PHPZip\Zip\Exception\HeadersSent;
 use PHPZip\Zip\Exception\IncompatiblePhpVersion;
 use PHPZip\Zip\Listener\ZipArchiveListener;
 
-/**
- * Description of PHPZipMerge
- *
- * @author Grandt
- */
 class ZipMerge {
 	const APP_NAME = 'PHPZipMerge';
-	const VERSION = "0.1.0";
+	const VERSION = "1.0.0";
 	const MIN_PHP_VERSION = 5.3; // for namespaces
 	
 	const CONTENT_TYPE = 'application/zip';
+
+    const MODE_STREAM = 0;
+    const MODE_INLINE = 1;
 
     private $_listeners = array();
 
@@ -35,43 +45,70 @@ class ZipMerge {
 	protected $CDRindex = 0;
 	protected $entryOffset = 0;
 	protected $streamChunkSize = 65536; // 64kb
+    protected $mode = self::MODE_STREAM;
+    /** @var $writer AbstractZipArchive */
+    public $writer = null;
 
 	/**
 	 * Constructor.
+     * If $fileName is set to null, the class will not be streaming the data, and instead expect to receive a $writer
+     * class for callbacks in the appendZip function.
 	 *
 	 * @param String $fileName The name of the Zip archive, in ISO-8859-1 (or ASCII) encoding, ie. "archive.zip". Optional, defaults to NULL, which means that no ISO-8859-1 encoded file name will be specified.
 	 * @param String $contentType Content mime type. Optional, defaults to "application/zip".
 	 * @param String $utf8FileName The name of the Zip archive, in UTF-8 encoding. Optional, defaults to NULL, which means that no UTF-8 encoded file name will be specified.
 	 * @param bool $inline Use Content-Disposition with "inline" instead of "attached". Optional, defaults to false.
 	 */
-	public function __construct($fileName = "", $contentType = "application/zip", $utf8FileName = null, $inline = false) {
+	public function __construct($fileName = null, $contentType = "application/zip", $utf8FileName = null, $inline = false) {
         $this->checkVersion();
 
-		$this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline);
-		$this->zipFlushBuffer();
-		
-		$this->eocd = new EndOfCentralDirectory();
+        if ($fileName !== null) {
+            $this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline);
+            $this->zipFlushBuffer();
+            $this->eocd = new EndOfCentralDirectory();
+        } else {
+            $this->mode = self::MODE_INLINE;
+        }
 	}
 
 	public function __destruct() {
 		$this->isFinalized = true;
-		exit;
+        unset ($this->FILES);
 	}
 
-	public function appendZip($file, $subPath = '') {
+    /**
+     * Append the contents of an existing zip file to the current, WITHOUT re-compressing the data within it.
+     *
+     * @param string $file the path to the zip file to be added.
+     * @param string $subPath place the contents in the $subPath sub-folder, default is '', and places the
+     *        content in the root of the new zip file.
+     * @param AbstractZipArchive $writer Only used by the PHPZip files. Will write all output to the $writer,
+     *        instead of the stream.
+     * @return bool true for success.
+     */
+    public function appendZip($file, $subPath = '', $writer = null) {
 		if ($this->isFinalized) {
 			return false;
 		}
-
+        $this->writer = $writer;
         if (!empty($subPath)) {
-            $subPath = str_replace("\\", '/', $subPath);
-            $subPath = rtrim($subPath, '/') . '/';
+            $subPath = ZipUtils::getRelativePath($subPath);
+            $subPath = rtrim($subPath, '/');
 
-            $fileEntry = ZipFileEntry::createDirEntry($subPath, time());
-            $this->zipWrite($fileEntry->getLocalHeader());
-            $this->FILES[$this->LFHindex++] = $fileEntry;
-            $this->CDRindex++;
+            if (!empty($subPath)) {
+                $subPath .= '/';
+                $path = explode('/', $subPath);
+                $nPath = '';
+                foreach ($path as $dir) {
+                    $nPath .= $dir . '/';
+                    $fileEntry = ZipFileEntry::createDirEntry($nPath, time());
+                    $data = $fileEntry->getLocalHeader();
+                    $this->zipWrite($data);
 
+                    $this->FILES[$this->LFHindex++] = $fileEntry;
+                    $this->CDRindex++;
+                }
+            }
         }
 		
 		if (is_string($file) && is_file($file)) {
@@ -117,16 +154,19 @@ class ZipMerge {
 
 				$lf = $fileEntry->getLocalHeader();
 				$lfLen =  ZipUtils::bin_strlen($lf);
-				$this->zipWrite($lf);
+                $this->zipWrite($lf);
+
 				fseek($handle, $fileEntry->offset + $fileEntry->dataOffset, SEEK_SET);
 				if (!$fileEntry->isDirectory) {
 					$len = $fileEntry->gzLength;
 					while ($len >= $this->streamChunkSize) {
-						$this->zipWrite(fread($handle, $this->streamChunkSize));
+						$data = fread($handle, $this->streamChunkSize);
+                        $this->zipWrite($data);
 						$len -= $this->streamChunkSize;
 					}
-					$this->zipWrite(fread($handle, $len));
-				}
+					$data = fread($handle, $len);
+                    $this->zipWrite($data);
+                }
 				
 				$fileEntry->offset = $this->entryOffset;
 				$this->entryOffset += $lfLen + $fileEntry->gzLength;
@@ -143,31 +183,40 @@ class ZipMerge {
 	 *
 	 * @author A. Grandt <php@grandt.com>
 	 *
-	 * @return bool Success
-	 */
-	public function finalize() {
-		if (!$this->isFinalized) {
-			$this->eocd->cdrStart = $this->entryOffset;
-			$this->eocd->cdrLength = 0;
-			$this->eocd->cdrCount1 = 0;
+     * @return array|bool boole true/false for stream mode, an array of ZipFileEntry for inline mode.
+     */
+    public function finalize() {
+        if ($this->mode == self::MODE_STREAM) {
+            if (!$this->isFinalized) {
+                $this->eocd->cdrStart = $this->entryOffset;
+                $this->eocd->cdrLength = 0;
+                $this->eocd->cdrCount1 = 0;
 
-			foreach ($this->FILES as $fileEntry) {
-                /* @var $fileEntry ZipFileEntry */
-                $this->eocd->cdrCount1++;
-				$cd = $fileEntry->getCentralDirectoryHeader();
+                foreach ($this->FILES as $fileEntry) {
+                    /* @var $fileEntry ZipFileEntry */
+                    $this->eocd->cdrCount1++;
+                    $cd = $fileEntry->getCentralDirectoryHeader();
 
-				$this->eocd->cdrLength += ZipUtils::bin_strlen($cd);
-				$this->zipWrite($cd);
-			}
+                    $this->eocd->cdrLength += ZipUtils::bin_strlen($cd);
+                    $this->zipWrite($cd);
+                }
 
-			$this->eocd->cdrCount2 = $this->eocd->cdrCount1;
-			$this->zipWrite(''.$this->eocd);
-
-			return true;
-		}
-		return false;
+                $this->eocd->cdrCount2 = $this->eocd->cdrCount1;
+                $this->zipWrite(''.$this->eocd);
+                $this->isFinalized = true;
+                return true;
+            }
+            return false;
+        } else {
+            $this->isFinalized = true;
+            return $this->FILES;
+        }
 	}
-	
+
+    public function getFileEntries() {
+        return $this->FILES;
+    }
+
 	/*
 	 * ************************************************************************
 	 * protected methods.
@@ -348,7 +397,12 @@ class ZipMerge {
 	 * @param string $data
 	 */
 	public function zipWrite($data) {
-		print($data);
+        if ($this->writer == null || $this->mode == self::MODE_STREAM) {
+            print($data);
+        } else {
+//            print "<pre>" . __CLASS__ . "->zipWrite: " . strlen($data) . ":" . bin2hex($data) . "</pre>\n";
+            call_user_func_array(array($this->writer, "zipWrite"), array($data));
+        }
 	}
 
 	/**
@@ -367,6 +421,8 @@ class ZipMerge {
 	 *
 	 */
 	public function zipFlushBuffer() {
-		flush();
+        if ($this->mode == self::MODE_STREAM) {
+            flush();
+        }
 	}
 }

@@ -10,12 +10,14 @@
 
 namespace PHPZip\Zip\Core;
 
+use PHPZip\Zip\Core\Header\ZipFileEntry;
 use PHPZip\Zip\Listener\ZipArchiveListener as ZipArchiveListener;
 use PHPZip\Zip\Exception\IncompatiblePhpVersion as IncompatiblePhpVersionException;
 use PHPZip\Zip\Exception\InvalidPhpConfiguration as InvalidPhpConfigurationException;
 use PHPZip\Zip\Exception\HeadersSent as HeadersSentException;
 use PHPZip\Zip\Exception\BufferNotEmpty as BufferNotEmptyException;
 use PHPZip\Zip\Exception\LengthMismatch as LengthMismatchException;
+use PHPZip\Zip\Stream\ZipMerge;
 
 abstract class AbstractZipArchive {
 	const APP_NAME = 'PHPZip';
@@ -68,7 +70,7 @@ abstract class AbstractZipArchive {
 
 	private $_listeners = array();
 	private $_phpConfigurationWatch = array(
-		'mbstring.func_overload' => '0' // throw an exception if setting in php.ini is not '0'
+		// 'mbstring.func_overload' => '0' // throw an exception if setting in php.ini is not '0'
 	);
 
 	/**
@@ -98,7 +100,7 @@ abstract class AbstractZipArchive {
 		}
 	}
 
-	/**
+    /**
 	 * Extra fields on the Zip directory records are Unix time codes needed for compatibility on the default Mac zip archive tool.
 	 * These are enabled as default, as they do no harm elsewhere and only add 26 bytes per file added.
 	 *
@@ -308,6 +310,27 @@ abstract class AbstractZipArchive {
 			}
 		}
 	}
+
+    /**
+     * Append the contents of an existing zip file to the current, WITHOUT re-compressing the data within it.
+     *
+     * @param string $file the path to the zip file to be added.
+     * @param string $subPath place the contents in the $subPath sub-folder, default is '', and places the
+     *        content in the root of the new zip file.
+     */
+    public function appendZip($file, $subPath = '') {
+        $zipMerge = new ZipMerge(null);
+        $zipMerge->appendZip($file, $subPath, $this);
+        $files = $zipMerge->finalize();
+
+        /* @var $files array */
+        foreach ($files as $fileEntry) {
+            /* @var $fileEntry ZipFileEntry */
+            $fileEntry->offset = $this->offset;
+            $this->cdRec[] = $fileEntry->getCentralDirectoryHeader();
+            $this->offset += ZipUtils::bin_strlen( $fileEntry->getLocalHeader()) + $fileEntry->gzLength;
+        }
+    }
 
 	/**
 	 * Add a file to the archive at the specified location and file name.

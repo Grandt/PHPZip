@@ -125,6 +125,10 @@ class Zip extends AbstractZipArchive {
      * @return bool $success
      */
     public function sendZip($fileName = null, $contentType = self::CONTENT_TYPE, $utf8FileName = null, $inline = false) {
+        if (!$this->isFinalized) {
+            $this->finalize();
+        }
+
         if ($this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline)) {
             header('Content-Length: ' . $this->getArchiveSize());
 

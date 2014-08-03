@@ -1,3 +1,11 @@
+Rev. 2.0.3 - 2014-08-03
+* Added: added function appendZip to the Zip classes. This allows the ser to add pre-compressed static data to the final Zip file, without having to re-compress this data.
+*****************************************************************************************************************
+WARNING: THE CURRENT VERSION OF PHPZip *MAY* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
+OLDER VERSIONS OF PHPZip *WILL* FAIL IF THE SERVER HAS mbstring.func_overload INSTALLED AND ACTIVE!
+EXPERIMENTAL FEATURES HAVE BEEN ADDED TO ALLEVIATE THE LOBOTOMIZATION OF PHP, CAUSED BY mbstring.func_overload
+*****************************************************************************************************************
+---------------------------------------------------------------------
 Rev. 2.0.2 - 2014-07-30
 * Added: Added ZipMerge utility. Allows preexisting zip files to be merged into one on the fly, streamed to the client. TODO: Add appendZip function to AbstractZipArchive.
 ---------------------------------------------------------------------
