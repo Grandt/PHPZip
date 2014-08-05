@@ -10,104 +10,105 @@
 
 namespace PHPZip\Zip\File;
 
+use com\grandt\BinStringStatic;
 use PHPZip\Zip\Core\AbstractZipArchive;
 use PHPZip\Zip\Core\ZipUtils;
 
 class Zip extends AbstractZipArchive {
 
-	const MEMORY_THRESHOLD = 1048576; // 1 MB - Auto create temp file if the zip data exceeds this
-	const STREAM_CHUNK_SIZE = 65536; // 64 KB
+    const MEMORY_THRESHOLD = 1048576; // 1 MB - Auto create temp file if the zip data exceeds this
+    const STREAM_CHUNK_SIZE = 65536; // 64 KB
 
-	private $_zipData = null;
-	private $_zipFile = null;
+    private $_zipData = null;
+    private $_zipFile = null;
 
-	/**
-	 * Constructor.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param boolean $useZipFile Write temp zip data to tempFile? Default FALSE
-	 *
-	 * @throws \PHPZip\Zip\Exception\InvalidPhpConfiguration In case of errors
-	 */
-	public function __construct($useZipFile = false){
-		parent::__construct(self::STREAM_CHUNK_SIZE);
+    /**
+     * Constructor.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @param boolean $useZipFile Write temp zip data to tempFile? Default FALSE
+     *
+     * @throws \PHPZip\Zip\Exception\InvalidPhpConfiguration In case of errors
+     */
+    public function __construct($useZipFile = false){
+        parent::__construct(self::STREAM_CHUNK_SIZE);
 
-		if ($useZipFile) {
-			$this->_zipFile = tmpfile();
-		} else {
-			$this->_zipData = '';
-		}
-	}
+        if ($useZipFile) {
+            $this->_zipFile = tmpfile();
+        } else {
+            $this->_zipData = '';
+        }
+    }
 
-	/**
-	 * Destructor.
-	 * Perform clean up actions.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 */
-	public function __destruct(){
-		if (is_resource($this->_zipFile)) {
-			fclose($this->_zipFile);
-		}
+    /**
+     * Destructor.
+     * Perform clean up actions.
+     *
+     * @author A. Grandt <php@grandt.com>
+     */
+    public function __destruct(){
+        if (is_resource($this->_zipFile)) {
+            fclose($this->_zipFile);
+        }
 
-		$this->_zipData = null;
-	}
+        $this->_zipData = null;
+    }
 
-	/**
-	 * Set zip file to write zip data to.
-	 * This will cause all present and future data written to this class to be written to this file.
-	 * This can be used at any time, even after the Zip Archive have been finalized. Any previous file will be closed.
-	 * Warning: If the given file already exists, it will be overwritten.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @param string $fileName
-	 *
-	 * @return bool Success
-	 */
-	public function setZipFile($fileName) {
-		if (is_file($fileName)) {
-			unlink($fileName);
-		}
+    /**
+     * Set zip file to write zip data to.
+     * This will cause all present and future data written to this class to be written to this file.
+     * This can be used at any time, even after the Zip Archive have been finalized. Any previous file will be closed.
+     * Warning: If the given file already exists, it will be overwritten.
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @param string $fileName
+     *
+     * @return bool Success
+     */
+    public function setZipFile($fileName) {
+        if (is_file($fileName)) {
+            unlink($fileName);
+        }
 
-		$fd = fopen($fileName, "x+b");
+        $fd = fopen($fileName, "x+b");
 
-		if (is_resource($this->_zipFile)) {
-			rewind($this->_zipFile);
+        if (is_resource($this->_zipFile)) {
+            rewind($this->_zipFile);
 
-			while (!feof($this->_zipFile)) {
-				fwrite($fd, fread($this->_zipFile, $this->streamChunkSize));
-			}
+            while (!feof($this->_zipFile)) {
+                fwrite($fd, fread($this->_zipFile, $this->streamChunkSize));
+            }
 
-			fclose($this->_zipFile);
-		} else {
-			fwrite($fd, $this->_zipData);
-			$this->_zipData = null;
-		}
+            fclose($this->_zipFile);
+        } else {
+            fwrite($fd, $this->_zipData);
+            $this->_zipData = null;
+        }
 
-		$this->_zipFile = $fd;
-		return true;
-	}
+        $this->_zipFile = $fd;
+        return true;
+    }
 
-	/**
-	 * Get the handle resource for the archive zip file.
-	 * If the zip haven't been finalized yet, this will cause it to become finalized
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @return resource zip file handle
-	 */
-	public function getZipFile() {
-		if (!$this->isFinalized) {
-			$this->finalize();
-		}
+    /**
+     * Get the handle resource for the archive zip file.
+     * If the zip haven't been finalized yet, this will cause it to become finalized
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @return resource zip file handle
+     */
+    public function getZipFile() {
+        if (!$this->isFinalized) {
+            $this->finalize();
+        }
 
-		$this->zipFlush();
-		rewind($this->_zipFile);
-		return $this->_zipFile;
-	}
+        $this->zipFlush();
+        rewind($this->_zipFile);
+        return $this->_zipFile;
+    }
 
     /**
      * Send the archive as a zip download
@@ -138,153 +139,153 @@ class Zip extends AbstractZipArchive {
     }
 
     /**
-	 * Get the zip file contents
-	 * If the zip haven't been finalized yet, this will cause it to become finalized
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @return string zip data
-	 */
-	public function getZipData() {
-		$result = null;
+     * Get the zip file contents
+     * If the zip haven't been finalized yet, this will cause it to become finalized
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @return string zip data
+     */
+    public function getZipData() {
+        $result = null;
 
-		if (!$this->isFinalized) {
-			$this->finalize();
-		}
+        if (!$this->isFinalized) {
+            $this->finalize();
+        }
 
-		if (!is_resource($this->_zipFile)) {
-			$result = $this->_zipData;
-		} else {
-			rewind($this->_zipFile);
-			$stat = fstat($this->_zipFile);
-			$result = fread($this->_zipFile, $stat['size']);
-		}
+        if (!is_resource($this->_zipFile)) {
+            $result = $this->_zipData;
+        } else {
+            rewind($this->_zipFile);
+            $stat = fstat($this->_zipFile);
+            $result = fread($this->_zipFile, $stat['size']);
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 
-	/**
-	 * Return the current size of the archive
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 *
-	 * @return int Size of the archive
-	 */
-	public function getArchiveSize() {
-		if (!is_resource($this->_zipFile)) {
-			return ZipUtils::bin_strlen($this->_zipData);
-		}
+    /**
+     * Return the current size of the archive
+     *
+     * @author A. Grandt <php@grandt.com>
+     *
+     * @return int Size of the archive
+     */
+    public function getArchiveSize() {
+        if (!is_resource($this->_zipFile)) {
+            return BinStringStatic::_strlen($this->_zipData);
+        }
 
-		$stat = fstat($this->_zipFile);
-		return $stat['size'];
-	}
+        $stat = fstat($this->_zipFile);
+        return $stat['size'];
+    }
 
-	/*
-	 * ************************************************************************
-	 * Superclass callbacks.
-	 * ************************************************************************
-	 */
+    /*
+     * ************************************************************************
+     * Superclass callbacks.
+     * ************************************************************************
+     */
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * while building a zip entry.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param array $params Array that contains zipEntry.
-	 */
-	public function onBuildZipEntry(array $params){
-		$this->zipWrite($params['zipEntry']);
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * while building a zip entry.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @param array $params Array that contains zipEntry.
+     */
+    public function onBuildZipEntry(array $params){
+        $this->zipWrite($params['zipEntry']);
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * at the start of adding a file to the archive.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param array $params Array that contains gzLength.
-	 */
-	public function onBeginAddFile(array $params){
-		if (!is_resource($this->_zipFile) && ($this->offset + $params['gzLength']) > self::MEMORY_THRESHOLD) {
-			$this->zipFlush();
-		}
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * at the start of adding a file to the archive.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @param array $params Array that contains gzLength.
+     */
+    public function onBeginAddFile(array $params){
+        if (!is_resource($this->_zipFile) && ($this->offset + $params['gzLength']) > self::MEMORY_THRESHOLD) {
+            $this->zipFlush();
+        }
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * at the end of adding a file to the archive.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param array $params Array that contains gzData.
-	 */
-	public function onEndAddFile(array $params){
-		$this->zipWrite($params['gzData']);
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * at the end of adding a file to the archive.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @param array $params Array that contains gzData.
+     */
+    public function onEndAddFile(array $params){
+        $this->zipWrite($params['gzData']);
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * at the start of sending the zip file response header.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 */
-	public function onBeginBuildResponseHeader(){
-		if (!$this->isFinalized) {
-			$this->finalize();
-		}
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * at the start of sending the zip file response header.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     */
+    public function onBeginBuildResponseHeader(){
+        if (!$this->isFinalized) {
+            $this->finalize();
+        }
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * at the end of sending the zip file response header.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 */
-	public function onEndBuildResponseHeader(){
-		header('Connection: close');
-		header('Content-Length: ' . $this->getArchiveSize());
+    /**
+     * Called by superclass when specialised action is needed
+     * at the end of sending the zip file response header.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     */
+    public function onEndBuildResponseHeader(){
+        header('Connection: close');
+        header('Content-Length: ' . $this->getArchiveSize());
 
-		if (!is_resource($this->_zipFile)) {
-			echo $this->_zipData;
-		} else {
-			rewind($this->_zipFile);
+        if (!is_resource($this->_zipFile)) {
+            echo $this->_zipData;
+        } else {
+            rewind($this->_zipFile);
 
-			while (!feof($this->_zipFile)) {
-				echo fread($this->_zipFile, $this->streamChunkSize);
-			}
-		}
-	}
+            while (!feof($this->_zipFile)) {
+                echo fread($this->_zipFile, $this->streamChunkSize);
+            }
+        }
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * while opening a stream.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 */
-	public function onOpenStream(){
-		$this->zipFlush();
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * while opening a stream.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     */
+    public function onOpenStream(){
+        $this->zipFlush();
+    }
 
-	/**
-	 * Called by superclass when specialised action is needed
-	 * while processing a file.
-	 *
-	 * @author A. Grandt <php@grandt.com>
-	 * @author Greg Kappatos
-	 *
-	 * @param array $params Array that contains data.
-	 */
-	public function onProcessFile(array $params){
-		$this->zipWrite($params['data']);
-	}
+    /**
+     * Called by superclass when specialised action is needed
+     * while processing a file.
+     *
+     * @author A. Grandt <php@grandt.com>
+     * @author Greg Kappatos
+     *
+     * @param array $params Array that contains data.
+     */
+    public function onProcessFile(array $params){
+        $this->zipWrite($params['data']);
+    }
 
     /**
      * Verify if the memory buffer is about to be exceeded.

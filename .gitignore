@@ -50,3 +50,6 @@ Thumbs.db
 #####################################
 tests/screenshots/*
 tests/vendor/*
+/composer.lock
+/*.phar
+vendor
