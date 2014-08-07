@@ -53,3 +53,5 @@ tests/vendor/*
 /composer.lock
 /*.phar
 vendor
+/legacy/*.lock
+/legacy/vendor
