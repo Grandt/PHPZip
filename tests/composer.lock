@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6591d3fcaf6f354a5ab7960d6edd3a07",
+    "hash": "c313eb60db5c0c53babb04746d184476",
     "packages": [
         {
             "name": "phpunit/php-code-coverage",
@@ -704,7 +704,7 @@
     "packages-dev": [
         {
             "name": "grandt/binstring",
-            "version": "0.2.0.x-dev",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Grandt/PHPBinString.git",
@@ -803,16 +803,16 @@
         },
         {
             "name": "grandt/relativepath",
-            "version": "1.0.1.x-dev",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Grandt/PHPRelativePath.git",
-                "reference": "443bb6f3048c71b8418ee7725b837c0f9ec0e90e"
+                "reference": "72cf09be20d36db02de50c0372962b9f84e37316"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Grandt/PHPRelativePath/zipball/443bb6f3048c71b8418ee7725b837c0f9ec0e90e",
-                "reference": "443bb6f3048c71b8418ee7725b837c0f9ec0e90e",
+                "url": "https://api.github.com/repos/Grandt/PHPRelativePath/zipball/72cf09be20d36db02de50c0372962b9f84e37316",
+                "reference": "72cf09be20d36db02de50c0372962b9f84e37316",
                 "shasum": ""
             },
             "require": {
@@ -840,7 +840,7 @@
             "keywords": [
                 "file path"
             ],
-            "time": "2014-08-03 18:52:54"
+            "time": "2014-08-07 18:47:42"
         },
         {
             "name": "phpunit/phpunit-selenium",
@@ -901,10 +901,9 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "grandt/binstring": 20,
-        "grandt/relativepath": 20
-    },
+    "stability-flags": [
+
+    ],
     "prefer-stable": false,
     "platform": {
         "php": ">=5.3.0"
