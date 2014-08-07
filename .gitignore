@@ -62,3 +62,5 @@ tests/composer.lock
 legacy/vendor/autoload.php
 /tests/*.lock
 /legacy/vendor
+*.lock
+vendor
