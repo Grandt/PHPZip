@@ -1,6 +1,8 @@
 <?php
 namespace PHPZip\Zip\Core;
 
+use com\grandt\BinStringStatic;
+
 class ZipUtils {
     // Unix file types
     const S_IFIFO  = 0010000; // named pipe (fifo)
@@ -67,78 +69,6 @@ class ZipUtils {
     }
 
     /**
-     * Join $file to $dir path, and clean up any excess slashes.
-     *
-     * @author A. Grandt <php@grandt.com>
-     * @author Greg Kappatos
-     *
-     * @param string $dir
-     * @param string $file
-     *
-     * @return string Joined path, with the correct forward slash dir separator.
-     */
-    public static function pathJoin($dir, $file) {
-        return self::getRelativePath(
-            $dir . (empty($dir) || empty($file) ? '' : DIRECTORY_SEPARATOR) . $file
-        );
-    }
-
-    /**
-     * Clean up a path, removing any unnecessary elements such as /./, // or redundant ../ segments.
-     * If the path starts with a "/", it is deemed an absolute path and any /../ in the beginning is stripped off.
-     * The returned path will not end in a "/".
-     *
-     * Sometimes, when a path is generated from multiple fragments,
-     *  you can get something like "../data/html/../images/image.jpeg"
-     * This will normalize that example path to "../data/images/image.jpeg"
-     *
-     * @author A. Grandt <php@grandt.com>
-     *
-     * @param string $path The path to clean up
-     *
-     * @return string the clean path
-     */
-    public static function getRelativePath($path) {
-        $path = preg_replace("#/+\.?/+#", "/", str_replace("\\", "/", $path));
-        $dirs = explode("/", rtrim(preg_replace('#^(?:\./)+#', '', $path), '/'));
-
-        $offset = 0;
-        $sub = 0;
-        $subOffset = 0;
-        $root = "";
-
-        if (empty($dirs[0])) {
-            $root = "/";
-            $dirs = array_splice($dirs, 1);
-        } else if (preg_match("#[A-Za-z]:#", $dirs[0])) {
-            $root = strtoupper($dirs[0]) . "/";
-            $dirs = array_splice($dirs, 1);
-        }
-
-        $newDirs = array();
-        foreach ($dirs as $dir) {
-            if ($dir !== "..") {
-                $subOffset--;
-                $newDirs[++$offset] = $dir;
-            } else {
-                $subOffset++;
-                if (--$offset < 0) {
-                    $offset = 0;
-                    if ($subOffset > $sub) {
-                        $sub++;
-                    }
-                }
-            }
-        }
-
-        if (empty($root)) {
-            $root = str_repeat("../", $sub);
-        }
-
-        return $root . implode("/", array_slice($newDirs, 0, $offset));
-    }
-
-    /**
      * Create the file permissions for a file or directory, for use in the extFileAttr parameters.
      *
      * @author A. Grandt <php@grandt.com>
@@ -191,39 +121,5 @@ class ZipUtils {
 
     public static function clrBit(&$data, $bit) {
         $data &= ~(1 << $bit);
-    }
-
-    /**
-     * Initialize the vars that'll allow us to override mbstring.func_overload, if needed.
-     *
-     * @author A. Grandt <php@grandt.com>
-     *
-     * @return bool true if mbstring.func_overload is enabled.
-     */
-    public static function isMBStringOveridden() {
-        static $has_mb_overload = null;
-        if ($has_mb_overload ===  null) {
-            $has_mbstring = extension_loaded('mbstring');
-            $has_mb_shadow = (int) ini_get('mbstring.func_overload');
-            $has_mb_overload = $has_mbstring && ($has_mb_shadow & 2);
-        }
-        return $has_mb_overload;
-    }
-
-    /**
-     * Wrapper of strlen to escapt bmstring.func_overload.
-     *
-     * @author A. Grandt <php@grandt.com>
-     *
-     * @param string $string
-     *
-     * @return int byte length of the string parsed.
-     */
-    public static function bin_strlen($string) {
-        if (self::isMBStringOveridden()) {
-            return mb_strlen($string,'latin1');
-        } else {
-            return strlen($string);
-        }
     }
 }

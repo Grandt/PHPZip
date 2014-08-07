@@ -4,20 +4,20 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "47ae2e3cc3735fd73e617e0b04c20c54",
+    "hash": "6591d3fcaf6f354a5ab7960d6edd3a07",
     "packages": [
         {
             "name": "phpunit/php-code-coverage",
-            "version": "2.0.9",
+            "version": "2.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "ed8ac99ce38c3fd134128c898f7ca74665abef7f"
+                "reference": "6d196af48e8c100a3ae881940123e693da5a9217"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ed8ac99ce38c3fd134128c898f7ca74665abef7f",
-                "reference": "ed8ac99ce38c3fd134128c898f7ca74665abef7f",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6d196af48e8c100a3ae881940123e693da5a9217",
+                "reference": "6d196af48e8c100a3ae881940123e693da5a9217",
                 "shasum": ""
             },
             "require": {
@@ -69,7 +69,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-06-29 08:14:40"
+            "time": "2014-08-06 06:39:42"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -256,16 +256,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.1.3",
+            "version": "4.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "939cb801b3b2aa253aedd0b279f40bb8f35cec91"
+                "reference": "e0de628ff849e1804c7d644cbaa16d0a5504807a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/939cb801b3b2aa253aedd0b279f40bb8f35cec91",
-                "reference": "939cb801b3b2aa253aedd0b279f40bb8f35cec91",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e0de628ff849e1804c7d644cbaa16d0a5504807a",
+                "reference": "e0de628ff849e1804c7d644cbaa16d0a5504807a",
                 "shasum": ""
             },
             "require": {
@@ -279,7 +279,7 @@
                 "phpunit/php-file-iterator": "~1.3.1",
                 "phpunit/php-text-template": "~1.2",
                 "phpunit/php-timer": "~1.0.2",
-                "phpunit/phpunit-mock-objects": "~2.1",
+                "phpunit/phpunit-mock-objects": "2.1.5",
                 "sebastian/comparator": "~1.0",
                 "sebastian/diff": "~1.1",
                 "sebastian/environment": "~1.0",
@@ -326,7 +326,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-06-11 14:15:47"
+            "time": "2014-08-07 05:43:51"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -655,17 +655,17 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.1",
+            "version": "v2.5.3",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "1057e87364c0b38b50f5695fc9df9dd189036bec"
+                "reference": "5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/1057e87364c0b38b50f5695fc9df9dd189036bec",
-                "reference": "1057e87364c0b38b50f5695fc9df9dd189036bec",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f",
+                "reference": "5a75366ae9ca8b4792cd0083e4ca4dff9fe96f1f",
                 "shasum": ""
             },
             "require": {
@@ -688,22 +688,160 @@
             ],
             "authors": [
                 {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
                     "name": "Symfony Community",
                     "homepage": "http://symfony.com/contributors"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
                 }
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-07-08 12:21:33"
+            "time": "2014-08-05 09:00:40"
         }
     ],
     "packages-dev": [
+        {
+            "name": "grandt/binstring",
+            "version": "0.2.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Grandt/PHPBinString.git",
+                "reference": "fc619d3eb291cd953166e0143c43ca2b3137622f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Grandt/PHPBinString/zipball/fc619d3eb291cd953166e0143c43ca2b3137622f",
+                "reference": "fc619d3eb291cd953166e0143c43ca2b3137622f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "BinString.php",
+                    "BinStringStatic.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "A. Grandt",
+                    "email": "php@grandt.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A class for working around the use of mbstring.func_override",
+            "homepage": "https://github.com/Grandt/PHPBinString",
+            "keywords": [
+                "binary strings",
+                "mbstring"
+            ],
+            "time": "2014-08-05 06:21:17"
+        },
+        {
+            "name": "grandt/phpzipmerge",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Grandt/PHPZipMerge.git",
+                "reference": "421d6226125fa6f717ab83476a2e3578aedf5763"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Grandt/PHPZipMerge/zipball/421d6226125fa6f717ab83476a2e3578aedf5763",
+                "reference": "421d6226125fa6f717ab83476a2e3578aedf5763",
+                "shasum": ""
+            },
+            "require": {
+                "grandt/binstring": "0.2.0.*@dev",
+                "grandt/relativepath": "1.0.1.*@dev",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ZipMerge\\": "src/ZipMerge"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "A. Grandt",
+                    "email": "php@grandt.com",
+                    "homepage": "http://grandt.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Greg Kappatos",
+                    "homepage": "http://websiteconnect.com.au",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Merge and stream multiple Zip files on the fly.",
+            "homepage": "https://github.com/Grandt/PHPZipMerge",
+            "keywords": [
+                "archive",
+                "compressed",
+                "compression",
+                "merge",
+                "phpzip",
+                "pkzip",
+                "stream",
+                "zip"
+            ],
+            "time": "2014-08-07 05:39:36"
+        },
+        {
+            "name": "grandt/relativepath",
+            "version": "1.0.1.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Grandt/PHPRelativePath.git",
+                "reference": "443bb6f3048c71b8418ee7725b837c0f9ec0e90e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Grandt/PHPRelativePath/zipball/443bb6f3048c71b8418ee7725b837c0f9ec0e90e",
+                "reference": "443bb6f3048c71b8418ee7725b837c0f9ec0e90e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "RelativePath.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "A. Grandt",
+                    "email": "php@grandt.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A class for cleaning up/collapsing relative paths. Like real_path, but without the need for the path to exist on the filesystem.",
+            "homepage": "https://github.com/Grandt/PHPRelativePath",
+            "keywords": [
+                "file path"
+            ],
+            "time": "2014-08-03 18:52:54"
+        },
         {
             "name": "phpunit/phpunit-selenium",
             "version": "1.3.3",
@@ -763,9 +901,11 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "grandt/binstring": 20,
+        "grandt/relativepath": 20
+    },
+    "prefer-stable": false,
     "platform": {
         "php": ">=5.3.0"
     },
