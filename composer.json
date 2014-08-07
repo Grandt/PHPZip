@@ -5,7 +5,7 @@
     "keywords": ["phpzip", "zip", "pkzip", "archive", "compressed", "compression", "stream"],
     "homepage": "https://github.com/Grandt/PHPZip",
     "license": "LGPL-2.1",
-    "version": "2.0.5",
+    "version": "2.0.6",
     "authors": [
         {
             "name": "A. Grandt",
@@ -25,8 +25,8 @@
         }
     ],
     "require": {
-        "grandt/binstring": "0.2.0.*@dev",
-        "grandt/relativepath": "1.0.1.*@dev",
+        "grandt/binstring": ">=0.2.0",
+        "grandt/relativepath": ">=1.0.1",
         "grandt/phpzipmerge": ">=1.0.1",
         "php": ">=5.3.0"
     },

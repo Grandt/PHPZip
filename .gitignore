@@ -55,3 +55,12 @@ tests/vendor/*
 vendor
 /legacy/*.lock
 /legacy/vendor
+legacy/vendor/autoload.php
+tests/composer.lock
+tests/composer.lock
+tests/composer.lock
+legacy/vendor/autoload.php
+/tests/*.lock
+/legacy/vendor
+*.lock
+vendor

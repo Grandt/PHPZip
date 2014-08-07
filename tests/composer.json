@@ -5,8 +5,8 @@
     },
     "require-dev": {
         "phpunit/phpunit-selenium": ">=1.2",
-        "grandt/binstring": "0.2.0.*@dev",
-        "grandt/relativepath": "1.0.1.*@dev",
+        "grandt/binstring": ">=0.2.0",
+        "grandt/relativepath": ">=1.0.1",
         "grandt/phpzipmerge": ">=1.0.1"
     },
     "autoload": {
