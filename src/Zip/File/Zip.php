@@ -12,7 +12,6 @@ namespace PHPZip\Zip\File;
 
 use com\grandt\BinStringStatic;
 use PHPZip\Zip\Core\AbstractZipArchive;
-use PHPZip\Zip\Core\ZipUtils;
 
 class Zip extends AbstractZipArchive {
 
