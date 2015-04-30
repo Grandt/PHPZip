@@ -42,7 +42,7 @@ $zip->closeStream();
 
 // For this test you need to create a large text file called "big one1.txt"
 if (file_exists("big one1.txt")) {
-	$zip->addLargeFile("big one1.txt", "big one2a.txt", 0, null, ZipStream::getFileExtAttr("big one1.txt"));
+	$zip->addLargeFile("big one1.txt", "big one2a.txt", 0, null, \PHPZip\Zip\Core\ZipUtils::getFileExtAttr("big one1.txt"));
 
 	$fhandle = fopen("big one1.txt", "rb");
 	$zip->addLargeFile($fhandle, "big one2b.txt");

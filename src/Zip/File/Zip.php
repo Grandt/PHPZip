@@ -31,7 +31,7 @@ class Zip extends AbstractZipArchive {
      *
      * @throws \PHPZip\Zip\Exception\InvalidPhpConfiguration In case of errors
      */
-    public function __construct($useZipFile = false){
+    public function __construct($useZipFile = false) {
         parent::__construct(self::STREAM_CHUNK_SIZE);
 
         if ($useZipFile) {
@@ -47,7 +47,7 @@ class Zip extends AbstractZipArchive {
      *
      * @author A. Grandt <php@grandt.com>
      */
-    public function __destruct(){
+    public function __destruct() {
         if (is_resource($this->_zipFile)) {
             fclose($this->_zipFile);
         }
@@ -92,6 +92,17 @@ class Zip extends AbstractZipArchive {
     }
 
     /**
+     * Alias for setZipFile
+     *
+     * @param $fileName
+     *
+     * @return bool
+     */
+    public function saveZipFile($fileName) {
+        return $this->setZipFile($fileName);
+    }
+
+    /**
      * Get the handle resource for the archive zip file.
      * If the zip haven't been finalized yet, this will cause it to become finalized
      *
@@ -120,7 +131,7 @@ class Zip extends AbstractZipArchive {
      * @param String $contentType   Content mime type. Optional, defaults to "application/zip".
      * @param String $utf8FileName  The name of the Zip archive, in UTF-8 encoding. Optional, defaults
      *                              to null, which means that no UTF-8 encoded file name will be specified.
-     * @param bool $inline          Use Content-Disposition with "inline" instead of "attached". Optional, defaults to false.
+     * @param bool   $inline        Use Content-Disposition with "inline" instead of "attached". Optional, defaults to false.
      *
      * @return bool $success
      */
@@ -130,8 +141,6 @@ class Zip extends AbstractZipArchive {
         }
 
         if ($this->buildResponseHeader($fileName, $contentType, $utf8FileName, $inline)) {
-            header('Content-Length: ' . $this->getArchiveSize());
-
             return true;
         }
         return false;
@@ -157,7 +166,7 @@ class Zip extends AbstractZipArchive {
             $result = $this->_zipData;
         } else {
             rewind($this->_zipFile);
-            $stat = fstat($this->_zipFile);
+            $stat   = fstat($this->_zipFile);
             $result = fread($this->_zipFile, $stat['size']);
         }
 
@@ -195,7 +204,7 @@ class Zip extends AbstractZipArchive {
      *
      * @param array $params Array that contains zipEntry.
      */
-    public function onBuildZipEntry(array $params){
+    public function onBuildZipEntry(array $params) {
         $this->zipWrite($params['zipEntry']);
     }
 
@@ -208,7 +217,7 @@ class Zip extends AbstractZipArchive {
      *
      * @param array $params Array that contains gzLength.
      */
-    public function onBeginAddFile(array $params){
+    public function onBeginAddFile(array $params) {
         if (!is_resource($this->_zipFile) && ($this->offset + $params['gzLength']) > self::MEMORY_THRESHOLD) {
             $this->zipFlush();
         }
@@ -223,7 +232,7 @@ class Zip extends AbstractZipArchive {
      *
      * @param array $params Array that contains gzData.
      */
-    public function onEndAddFile(array $params){
+    public function onEndAddFile(array $params) {
         $this->zipWrite($params['gzData']);
     }
 
@@ -234,7 +243,7 @@ class Zip extends AbstractZipArchive {
      * @author A. Grandt <php@grandt.com>
      * @author Greg Kappatos
      */
-    public function onBeginBuildResponseHeader(){
+    public function onBeginBuildResponseHeader() {
         if (!$this->isFinalized) {
             $this->finalize();
         }
@@ -247,7 +256,7 @@ class Zip extends AbstractZipArchive {
      * @author A. Grandt <php@grandt.com>
      * @author Greg Kappatos
      */
-    public function onEndBuildResponseHeader(){
+    public function onEndBuildResponseHeader() {
         header('Connection: close');
         header('Content-Length: ' . $this->getArchiveSize());
 
@@ -269,7 +278,7 @@ class Zip extends AbstractZipArchive {
      * @author A. Grandt <php@grandt.com>
      * @author Greg Kappatos
      */
-    public function onOpenStream(){
+    public function onOpenStream() {
         $this->zipFlush();
     }
 
@@ -282,7 +291,7 @@ class Zip extends AbstractZipArchive {
      *
      * @param array $params Array that contains data.
      */
-    public function onProcessFile(array $params){
+    public function onProcessFile(array $params) {
         $this->zipWrite($params['data']);
     }
 
@@ -307,7 +316,7 @@ class Zip extends AbstractZipArchive {
      */
     public function zipWrite($data) {
         if (!is_resource($this->_zipFile)) {
-           $this->_zipData .= $data;
+            $this->_zipData .= $data;
         } else {
             fwrite($this->_zipFile, $data);
             fflush($this->_zipFile);
