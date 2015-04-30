@@ -740,7 +740,7 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
             @ini_set($zlibConfig, 'Off');
         }
 
-        $cd = 'Content-Disposition: ' . ($inline ? 'inline' : 'attached');
+        $cd = 'Content-Disposition: ' . ($inline ? 'inline' : 'attachment');
 
         if ($fileName) {
             $cd .= '; filename="' . $fileName . '"';

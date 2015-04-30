@@ -131,7 +131,7 @@ class Zip extends AbstractZipArchive {
      * @param String $contentType   Content mime type. Optional, defaults to "application/zip".
      * @param String $utf8FileName  The name of the Zip archive, in UTF-8 encoding. Optional, defaults
      *                              to null, which means that no UTF-8 encoded file name will be specified.
-     * @param bool   $inline        Use Content-Disposition with "inline" instead of "attached". Optional, defaults to false.
+     * @param bool   $inline        Use Content-Disposition with "inline" instead of "attachment". Optional, defaults to false.
      *
      * @return bool $success
      */
