@@ -25,9 +25,9 @@
         }
     ],
     "require": {
-        "grandt/binstring": ">=0.2.0",
-        "grandt/relativepath": ">=1.0.1",
-        "grandt/phpzipmerge": ">=1.0.3",
+        "grandt/binstring": ">=1.0.0",
+        "grandt/relativepath": ">=1.0.2",
+        "grandt/phpzipmerge": ">=1.0.4",
         "php": ">=5.3.0"
     },
     "autoload": {

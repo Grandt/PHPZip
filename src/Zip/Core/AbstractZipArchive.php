@@ -28,27 +28,38 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
     const MIN_PHP_VERSION = 5.3; // for namespaces
 
     const CONTENT_TYPE = 'application/zip';
-    const ZIP_LOCAL_FILE_HEADER = "PK\x03\x04"; // Local file header signature
-    const ZIP_CENTRAL_FILE_HEADER = "PK\x01\x02"; // Central file header signature
-    const ZIP_END_OF_CENTRAL_DIRECTORY = "PK\x05\x06\x00\x00\x00\x00"; //end of Central directory record
 
-    const EXT_FILE_ATTR_DIR = 010173200020;  // Permission 755 drwxr-xr-x = (((S_IFDIR | 0755) << 16) | S_DOS_D);
-    const EXT_FILE_ATTR_FILE = 020151000040; // Permission 644 -rw-r--r-- = (((S_IFREG | 0644) << 16) | S_DOS_A);
+    const NULL_BYTE = "\x00";
+    const NULL_WORD = "\x00\x00"; // Two nul bytes, used often enough.
+    const NULL_DWORD = "\x00\x00\x00\x00";
+
+    const ZIP_CENTRAL_FILE_HEADER = "PK\x01\x02"; // Central file header signature
+    const ZIP_LOCAL_FILE_HEADER = "PK\x03\x04"; // Local file header signature
+    const ZIP_LOCAL_DATA_DESCRIPTOR = "PK\x07\x08"; // Local Header, data descriptor
+    const ZIP_END_OF_CENTRAL_DIRECTORY = "PK\x05\x06"; // End of Central directory record
+
+    const HEADER_UNIX_TYPE_1 = 'UX';            // \x55\x58 or 0x5855 It has been replaced by the extended-timestamp extra block 'UT' (0x5455) and the Unix type 2 extra block 'Ux' (0x7855).
+    const HEADER_UNIX_TYPE_2 = 'Ux';            // \x55\x78 or 0x7855
+    const HEADER_UNIX_TYPE_3 = 'ux';            // \x75\x78 or 0x7875
+    const HEADER_EXTENDED_TIMESTAMP = 'UT';     // \x55\x54 or 0x5455
+    const HEADER_UNICODE_PATH = 'up';           // \x75\x70 or 0x7075
+    const HEADER_UNICODE_COMMENT = 'uc';        // \x75\x63 or 0x6375
+
+    const EXT_FILE_ATTR_DIR = 010173200020;     // Permission 755 drwxr-xr-x = (((S_IFDIR | 0755) << 16) | S_DOS_D);
+    const EXT_FILE_ATTR_FILE = 020151000040;    // Permission 644 -rw-r--r-- = (((S_IFREG | 0644) << 16) | S_DOS_A);
 
     const ATTR_VERSION_TO_EXTRACT = "\x14\x00"; // Version needed to extract = 20 (File is compressed using Deflate compression)
-    const ATTR_MADE_BY_VERSION = "\x1E\x03"; // Made By Version
+    const ATTR_MADE_BY_VERSION = "\x1E\x03";    // Made By Version
 
-    const NUL_NUL = "\x00\x00"; // Two nul bytes, used often enough.
+    const DEFAULT_GZ_TYPE = "\x08\x00";         // Compression type 8 = deflate
+    const DEFAULT_GP_FLAGS = self::NULL_WORD;     // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
 
-    const DEFAULT_GZ_TYPE = "\x08\x00";     // Compression type 8 = deflate
-    const DEFAULT_GP_FLAGS = self::NUL_NUL;     // General Purpose bit flags for compression type 8 it is: 0=Normal, 1=Maximum, 2=Fast, 3=super fast compression.
-
-    const DEFAULT_GZ_TYPE_STORED = self::NUL_NUL;  // Compression type 0 = stored
-    const DEFAULT_GP_FLAGS_STORED = self::NUL_NUL; // Compression type 0 = stored
+    const DEFAULT_GZ_TYPE_STORED = self::NULL_WORD;  // Compression type 0 = stored
+    const DEFAULT_GP_FLAGS_STORED = self::NULL_WORD; // Compression type 0 = stored
 
     // UID 1000, GID 0
-    const EXTRA_FIELD_NEW_UNIX_GUID = "ux\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00"; // \x75\x78 3rd gen Unis GUID
-    const EXTRA_FIELD_NEW_UNIX_GUID_CD = "ux\x00\x00"; // \x75\x78 3rd gen Unis GUID CD record version must have length 0.
+    const EXTRA_FIELD_NEW_UNIX_GUID = self::HEADER_UNIX_TYPE_3 . "\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00"; // \x75\x78 3rd gen Unis GUID
+    const EXTRA_FIELD_NEW_UNIX_GUID_CD = self::HEADER_UNIX_TYPE_3 . self::NULL_WORD; // \x75\x78 3rd gen Unis GUID CD record version must have length 0.
 
     protected $zipComment = null;
     protected $cdRec = array(); // central directory
@@ -611,14 +622,14 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
         $isFileUTF8 = mb_check_encoding($filePath, "UTF-8") && !mb_check_encoding($filePath, "ASCII");
         $isCommentUTF8 = !empty($fileComment) && mb_check_encoding($fileComment, "UTF-8") && !mb_check_encoding($fileComment, "ASCII");
 
-        $localExtraField = "";
-        $centralExtraField = "";
+        $locExField = "";
+        $cenExField = "";
 
         if ($this->addExtraField) {
-            $localExtraField .= "UT\x09\x00\x03" // \x55\x54
+            $locExField .= self::HEADER_EXTENDED_TIMESTAMP . "\x09\x00\x03"
                 . $tsPack . $tsPack
                 . self::EXTRA_FIELD_NEW_UNIX_GUID;
-            $centralExtraField .= "UT\x05\x00\x03" // \x55\x54
+            $cenExField .= self::HEADER_EXTENDED_TIMESTAMP . "\x05\x00\x03"
                 . $tsPack
                 . self::EXTRA_FIELD_NEW_UNIX_GUID_CD;
         }
@@ -632,17 +643,17 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
             $gpFlags = pack("v", $flag | (1 << 11));
 
             if ($isFileUTF8) {
-                $utfPathExtraField = "up" // "\x75\x70" // utf8 encoded File path extra field
+                $utfExField = self::HEADER_UNICODE_PATH // utf8 encoded File path extra field
                     . pack ("v", (5 + BinStringStatic::_strlen($filePath)))
                     . "\x01"
                     . pack("V", crc32($filePath))
                     . $filePath;
 
-                $localExtraField .= $utfPathExtraField;
-                $centralExtraField .= $utfPathExtraField;
+                $locExField .= $utfExField;
+                $cenExField .= $utfExField;
             }
             if ($isCommentUTF8) {
-                $centralExtraField .= "uc" // "\x75\x63" // utf8 encoded file comment extra field
+                $cenExField .= self::HEADER_UNICODE_COMMENT // utf8 encoded file comment extra field
                     . pack ("v", (5 + BinStringStatic::_strlen($fileComment)))
                     . "\x01"
                     . pack("V", crc32($fileComment))
@@ -656,9 +667,9 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
         $zipEntry  = self::ZIP_LOCAL_FILE_HEADER
             . self::ATTR_VERSION_TO_EXTRACT
             . $header
-            . pack("v", BinStringStatic::_strlen($localExtraField)) // Extra field length
+            . pack("v", BinStringStatic::_strlen($locExField)) // Extra field length
             . $filePath // FileName
-            . $localExtraField; // Extra fields
+            . $locExField; // Extra fields
 
         $this->onBuildZipEntry(array(
             'zipEntry' => $zipEntry,
@@ -668,14 +679,14 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
             . self::ATTR_MADE_BY_VERSION
             . ($dataLength === 0 ? "\x0A\x00" : self::ATTR_VERSION_TO_EXTRACT)
             . $header
-            . pack("v", BinStringStatic::_strlen($centralExtraField)) // Extra field length
+            . pack("v", BinStringStatic::_strlen($cenExField)) // Extra field length
             . pack("v", $fileCommentLength) // File comment length
-            . self::NUL_NUL // Disk number start
-            . self::NUL_NUL // internal file attributes
+            . self::NULL_WORD // Disk number start
+            . self::NULL_WORD // internal file attributes
             . pack("V", $extFileAttr) // External file attributes
             . pack("V", $this->offset) // Relative offset of local header
             . $filePath // FileName
-            . $centralExtraField; // Extra fields
+            . $cenExField; // Extra fields
 
         if (!empty($fileComment)) {
             $cdEntry .= $fileComment; // Comment
@@ -786,6 +797,7 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
 
             $cdRecSize = pack("v", sizeof($this->cdRec));
             $cdRec = $cd . self::ZIP_END_OF_CENTRAL_DIRECTORY
+                . self::NULL_DWORD // really two words, used for split archives: #ofThisDisk . #ofDiskWithCD. Both 0.
                 . $cdRecSize . $cdRecSize
                 . pack("VV", BinStringStatic::_strlen($cd), $this->offset);
 
@@ -793,7 +805,7 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
                 $cdRec .= pack("v", BinStringStatic::_strlen($this->zipComment))
                     . $this->zipComment;
             } else {
-                $cdRec .= self::NUL_NUL;
+                $cdRec .= self::NULL_WORD;
             }
 
             $this->zipWrite($cdRec);

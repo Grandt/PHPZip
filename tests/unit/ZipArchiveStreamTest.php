@@ -12,6 +12,7 @@
 
 $loader = require '../vendor/autoload.php';
 
+use PHPZip\Zip\Core\ZipUtils;
 use \PHPZip\Zip\Stream\ZipStream as ZipArchiveStream;
 
 class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
@@ -53,7 +54,7 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 
 		// For this test you need to create a large text file called "big one1.txt"
 		if (file_exists("big one1.txt")) {
-			$zip->addLargeFile("big one1.txt", "big one2a.txt", 0, null, ZipArchiveStream::getFileExtAttr("big one1.txt"));
+			$zip->addLargeFile("big one1.txt", "big one2a.txt", 0, null, ZipUtils::getFileExtAttr("big one1.txt"));
 
 			$fhandle = fopen("big one1.txt", "rb");
 			$zip->addLargeFile($fhandle, "big one2b.txt");

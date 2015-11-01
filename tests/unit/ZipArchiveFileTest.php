@@ -12,7 +12,10 @@
 
 $loader = require '../vendor/autoload.php';
 
+use com\grandt\php\LipsumGenerator;
+use PHPZip\Zip\Core\ZipUtils;
 use \PHPZip\Zip\File\Zip as ZipArchiveFile;
+use PHPZip\Zip\File\Zip;
 
 class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 
@@ -157,9 +160,8 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 		}
 
 		// Uses my Lipsum generator from https://github.com/Grandt/PHPLipsumGenerator
-		if (file_exists('./LipsumGenerator.php')) {
-			require_once './LipsumGenerator.php';
-			$lg = new com\grandt\php\LipsumGenerator();
+		if (class_exists ('LipsumGenerator')) {
+			$lg = new LipsumGenerator();
 			$zip->openStream("big one3.txt");
 			for ($i = 1 ; $i <= 20 ; $i++) {
 				$zip->addStreamData("Chapter $i\r\n\r\n" . $lg->generate(300, 2500) . "\r\n");
@@ -250,7 +252,7 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 					$pathData = pathinfo($fileDir . $file);
 					$fileName = $pathData['filename'];
 
-					$zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file), null, true, ZipArchiveFile::getFileExtAttr($file));
+					$zip->addFile(file_get_contents($fileDir . $file), $file, filectime($fileDir . $file), null, true, ZipUtils::getFileExtAttr($file));
 				}
 			}
 		}
