@@ -149,10 +149,16 @@ class ZipStream extends AbstractZipArchive {
      * @param int $gzLength length of the pending data.
      */
     public function zipVerifyMemBuffer($gzLength) {
-        while (ob_get_length() !== FALSE && ob_get_length() > $this->maxStreamBufferLength) {
-            $this->log("buffer exceeded, waiting..." . ob_get_length());
-            usleep(500000);
-            $this->log("buffer exceeded, resuming..." . ob_get_length());
+        if (ob_get_length() !== FALSE && ob_get_length() > $this->maxStreamBufferLength) {
+            $this->log("zipVerifyMemBuffer..." . ob_get_length());
+
+            ob_flush();
+
+            while (ob_get_length() > $this->maxStreamBufferLength) {
+                $this->log("buffer exceeded, waiting..." . ob_get_length());
+                usleep(500000);
+                $this->log("buffer exceeded, resuming..." . ob_get_length());
+            }
         }
     }
 

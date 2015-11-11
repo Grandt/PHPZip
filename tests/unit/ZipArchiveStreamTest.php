@@ -156,6 +156,8 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		 */
 		//include_once("ZipStream.php");
 
+        //ob_start(null, 65000);
+        ob_start();
 		$zip = new ZipStream("test3.zip");
 
 		/*
@@ -167,7 +169,12 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		$zip->addDirectoryContent("../../testData/images/1","images");
 
 		$zip->addFile($zip->getLog(), "log.txt");
-		return $zip->finalize();
+
+        $zip->finalize();
+
+        if (ob_get_length() > 0) {
+            ob_end_flush();
+        }
 	}
 }
 
