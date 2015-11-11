@@ -67,7 +67,9 @@ class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 
 		//echo sprintf("ob=%s len=%d\n", ob_get_contents(), ob_get_length());
 
-		ob_clean();
+		if (ob_get_length() > 0) {
+			ob_clean();
+		}
 		//ob_flush();
 
 		//var_dump(headers_list());

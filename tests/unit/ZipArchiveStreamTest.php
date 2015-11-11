@@ -10,10 +10,10 @@
  *
  */
 
-$loader = require '../vendor/autoload.php';
+$loader = require __DIR__ . '/../vendor/autoload.php';
 
 use PHPZip\Zip\Core\ZipUtils;
-use \PHPZip\Zip\Stream\ZipStream as ZipArchiveStream;
+use \PHPZip\Zip\Stream\ZipStream;
 
 class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 
@@ -41,7 +41,7 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 			. "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec magna lorem, mattis sit amet porta vitae, consectetur ut eros. Nullam id mattis lacus. In eget neque magna, congue imperdiet nulla. Aenean erat lacus, imperdiet a adipiscing non, dignissim eget felis. Nulla facilisi. Vivamus sit amet lorem eget mauris dictum pharetra. In mauris nulla, placerat a accumsan ac, mollis sit amet ligula. Donec eget facilisis dui. Cras elit quam, imperdiet at malesuada vitae, luctus id orci. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Pellentesque eu libero in leo ultrices tristique. Etiam quis ornare massa. Donec in velit leo. Sed eu ante tortor.\n";
 
 		//$zip = new ZipStream("ZipStreamExample1.zip");
-		$zip = new ZipArchiveStream('ZipStreamExample1.zip');
+		$zip = new ZipStream('ZipStreamExample1.zip');
 
 		$zip->setComment("Example Zip file for Large file sets.\nCreated on " . date('l jS \of F Y h:i:s A'));
 		$zip->addFile("Hello World!\r\n", "Hello.txt");
@@ -77,16 +77,14 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		// Add a directory, first recursively, then the same directory, but without recursion.
 		// Naturally this requires you to change the path to ../test to point to a directory of your own.
 		$zip->addDirectory("recursiveDir/");
-		$zip->addDirectoryContent("../test", "recursiveDir/test");
-		$zip->addDirectoryContent("../test", "recursiveDir/testFlat", FALSE);
+		$zip->addDirectoryContent("../../test", "recursiveDir/test");
+		$zip->addDirectoryContent("../../test", "recursiveDir/testFlat", FALSE);
 		/*
 		$addedFiles = array();
 		$zip->addDirectoryContent("../test", "recursiveDir/testPermisssions", TRUE, TRUE, $addedFiles,
 					TRUE, ZipStream::generateExtAttr(4, 4, 0, FALSE), ZipStream::generateExtAttr(4, 4, 0, TRUE));
 		*/
 		$zip->finalize(); // Mandatory, needed to send the Zip files central directory structure.
-
-
 	}
 
 	public function test1s(){
@@ -103,7 +101,7 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		//$zip = new ZipStream("ZipStreamExample1s.zip");
 		//$zip = new ZipStream("ZipStreamExample1s_€2,000.zip");
 		//$zip = new ZipStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
-		$zip = new ZipArchiveStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
+		$zip = new ZipStream("ZipStreamExample1s_€2,000.zip", "application/zip", "ZipStreamExample1s_€2,000_utf8.zip");
 
 		// Archive comments don't really support utf-8. Some tools detect and read it though.
 		$zip->setComment("Example Zip file for Large file sets.\nАрхив Комментарий\nCreated on " . date('l jS \of F Y h:i:s A'));
@@ -135,7 +133,7 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		 */
 		//include_once("ZipStream.php");
 
-		$zip = new ZipArchiveStream("test.zip");
+		$zip = new ZipStream("test.zip");
 
 		/*
 		 * As seen in the output, the above construct with a PHP end and start tag after
@@ -143,20 +141,39 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		 * space followed by the newline characters.
 		 */
 		$zip->addDirectory("test");
-		$zip->addDirectoryContent("testData/test","test");
+		$zip->addDirectoryContent("../../testData/test","test");
 
 		return $zip->finalize();
-
 	}
 
+	public function test3(){
+
+		/*
+		 * A test to see if it was possible to recreate the result of
+		 *  Issue #7, if not the cause.
+		 * And a demonstration why the author of the script calling zip
+		 *  needs to be diligent not to add extra characters to the output.
+		 */
+		//include_once("ZipStream.php");
+
+		$zip = new ZipStream("test3.zip");
+
+		/*
+		 * As seen in the output, the above construct with a PHP end and start tag after
+		 * creating the ZipStream is a bad idea. The Zip file will be starting with a
+		 * space followed by the newline characters.
+		 */
+		$zip->addDirectory("images");
+		$zip->addDirectoryContent("../../testData/images/1","images");
+
+		$zip->addFile($zip->getLog(), "log.txt");
+		return $zip->finalize();
+	}
 }
 
 $test = new ZipArchiveStreamTest();
 
-$test->test1();
+//$test->test1();
 //$test->test1s();
 //$test->test2();
-
-/*foreach (get_class_methods(get_class()) as $method)
-	if (substr($method, 0, 4) === 'test')
-		$test->$method();*/
+$test->test3();
