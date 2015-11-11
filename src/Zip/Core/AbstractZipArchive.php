@@ -24,7 +24,7 @@ use ZipMerge\Zip\Stream\ZipMerge;
 
 abstract class AbstractZipArchive extends AbstractZipWriter {
     const APP_NAME = 'PHPZip';
-    const VERSION = "2.0.6";
+    const VERSION = "2.0.8";
     const MIN_PHP_VERSION = 5.3; // for namespaces
 
     const CONTENT_TYPE = 'application/zip';
@@ -374,7 +374,7 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
                 while (!feof($fh)) {
                     $this->addStreamData(fread($fh, $this->streamChunkSize));
                 }
-                $this->closeStream($this->addExtraField);
+                $this->closeStream();
             }
             $result = true;
         }

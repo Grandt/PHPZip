@@ -15,6 +15,7 @@ use PHPZip\Zip\Core\AbstractZipArchive;
 class ZipStream extends AbstractZipArchive {
 
     const STREAM_CHUNK_SIZE = 16384; // 16 KB
+    private $maxStreamBufferLength = 1024*1024;
 
     /**
      * Constructor.
@@ -148,6 +149,10 @@ class ZipStream extends AbstractZipArchive {
      */
     public function zipVerifyMemBuffer($gzLength) {
         // Does nothing.
+
+        while (ob_get_length() > $this->maxStreamBufferLength) {
+            usleep(1);
+        }
     }
 
     /**
@@ -177,5 +182,20 @@ class ZipStream extends AbstractZipArchive {
      */
     public function zipFlushBuffer() {
         flush();
+        $this->zipVerifyMemBuffer(0);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxStreamBufferLength() {
+        return $this->maxStreamBufferLength;
+    }
+
+    /**
+     * @param int $maxStreamBufferLength
+     */
+    public function setMaxStreamBufferLength($maxStreamBufferLength) {
+        $this->maxStreamBufferLength = $maxStreamBufferLength;
     }
 }
