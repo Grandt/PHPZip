@@ -374,7 +374,7 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
                 while (!feof($fh)) {
                     $this->addStreamData(fread($fh, $this->streamChunkSize));
                 }
-                $this->closeStream($this->addExtraField);
+                $this->closeStream();
             }
             $result = true;
         }

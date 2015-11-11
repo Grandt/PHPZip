@@ -14,8 +14,8 @@ $loader = require '../vendor/autoload.php';
 
 use com\grandt\php\LipsumGenerator;
 use PHPZip\Zip\Core\ZipUtils;
-use \PHPZip\Zip\File\Zip as ZipArchiveFile;
-use PHPZip\Zip\File\Zip;
+use PHPZip\Zip\File\Zip as ZipArchiveFile;
+
 
 class ZipArchiveFileTest /*extends \PHPUnit_Framework_TestCase*/ {
 
