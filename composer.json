@@ -5,7 +5,7 @@
     "keywords": ["phpzip", "zip", "pkzip", "archive", "compressed", "compression", "stream"],
     "homepage": "https://github.com/Grandt/PHPZip",
     "license": "LGPL-2.1",
-    "version": "2.0.7",
+    "version": "2.0.8",
     "authors": [
         {
             "name": "A. Grandt",
