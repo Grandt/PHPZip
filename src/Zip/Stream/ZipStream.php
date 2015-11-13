@@ -15,7 +15,7 @@ use PHPZip\Zip\Core\AbstractZipArchive;
 class ZipStream extends AbstractZipArchive {
 
     const STREAM_CHUNK_SIZE = 16384; // 16 KB
-    private $maxStreamBufferLength = 1024*1024;
+    private $maxStreamBufferLength = 1048576;
     private $log = "";
 
     /**
