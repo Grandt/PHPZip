@@ -58,8 +58,8 @@ abstract class AbstractZipArchive extends AbstractZipWriter {
     const DEFAULT_GP_FLAGS_STORED = self::NULL_WORD; // Compression type 0 = stored
 
     // UID 1000, GID 0
-    const EXTRA_FIELD_NEW_UNIX_GUID = self::HEADER_UNIX_TYPE_3 . "\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00"; // \x75\x78 3rd gen Unis GUID
-    const EXTRA_FIELD_NEW_UNIX_GUID_CD = self::HEADER_UNIX_TYPE_3 . self::NULL_WORD; // \x75\x78 3rd gen Unis GUID CD record version must have length 0.
+    const EXTRA_FIELD_NEW_UNIX_GUID = "ux\x0B\x00\x01\x04\xE8\x03\x00\x00\x04\x00\x00\x00\x00"; // \x75\x78 3rd gen Unis GUID
+    const EXTRA_FIELD_NEW_UNIX_GUID_CD = "ux\x00\x00"; // \x75\x78 3rd gen Unis GUID CD record version must have length 0.
 
     protected $zipComment = null;
     protected $cdRec = array(); // central directory
