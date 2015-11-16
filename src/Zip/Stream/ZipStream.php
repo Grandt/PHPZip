@@ -16,7 +16,6 @@ class ZipStream extends AbstractZipArchive {
 
     const STREAM_CHUNK_SIZE = 16384; // 16 KB
     private $maxStreamBufferLength = 1048576;
-    private $log = "";
 
     /**
      * Constructor.
@@ -150,14 +149,11 @@ class ZipStream extends AbstractZipArchive {
      */
     public function zipVerifyMemBuffer($gzLength) {
         if (ob_get_length() !== FALSE && ob_get_length() > $this->maxStreamBufferLength) {
-            $this->log("zipVerifyMemBuffer..." . ob_get_length());
 
             ob_flush();
 
             while (ob_get_length() > $this->maxStreamBufferLength) {
-                $this->log("buffer exceeded, waiting..." . ob_get_length());
                 usleep(500000);
-                $this->log("buffer exceeded, resuming..." . ob_get_length());
             }
         }
     }
@@ -204,21 +200,5 @@ class ZipStream extends AbstractZipArchive {
      */
     public function setMaxStreamBufferLength($maxStreamBufferLength) {
         $this->maxStreamBufferLength = $maxStreamBufferLength;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLog() {
-        return $this->log;
-    }
-
-    /**
-     * @param string $line
-     *
-     * @return string
-     */
-    public function log($line) {
-        $this->log .= $line . "\n";
     }
 }

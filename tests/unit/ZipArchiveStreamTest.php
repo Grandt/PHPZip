@@ -168,8 +168,6 @@ class ZipArchiveStreamTest /*extends \PHPUnit_Framework_TestCase*/ {
 		$zip->addDirectory("images");
 		$zip->addDirectoryContent("../../testData/images/1","images");
 
-		$zip->addFile($zip->getLog(), "log.txt");
-
         $zip->finalize();
 
         if (ob_get_length() > 0) {
